@@ -21,6 +21,22 @@ class ClientTest < Test::Unit::TestCase
     assert_equal 'NoMethodError', exception_report.type
   end
 
+  def test_report_exceptions_in_block
+    ExceptionLogger::Client.report_exceptions(:unit_test) do
+      raise new_exception
+    end
+
+    assert_equal 1, @backend.exceptions.length
+  end
+
+  def test_dont_raise_exceptions_during_report
+    ExceptionLogger::Client.backend = nil
+    
+    assert_nothing_raised do
+      ExceptionLogger::Client.report(:unit_test, new_exception, {:name => "Bob"})
+    end
+  end
+
   def new_exception
     exception = nil
     begin

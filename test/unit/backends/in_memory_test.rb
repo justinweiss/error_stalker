@@ -6,7 +6,7 @@ class BackendsInMemoryTest < Test::Unit::TestCase
   def setup
     super
     @backend = ExceptionLogger::Backends::InMemory.new
-    @exception_report = ExceptionLogger::ExceptionReport.new(:unit_test, 'Test Exception')
+    @exception_report = ExceptionLogger::ExceptionReport.new(:application => :unit_test, :exception => 'Test Exception')
   end
   
   def test_report_is_implemented

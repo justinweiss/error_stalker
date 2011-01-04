@@ -16,9 +16,20 @@ class ExceptionLogger::Client
 
   # Report an exception to the exception logging backend.
   def self.report(application_name, exception, extra_data = {})
-    @backend.report(ExceptionLogger::ExceptionReport.new(application_name, exception, extra_data))
+    begin
+      @backend.report(ExceptionLogger::ExceptionReport.new(:application => application_name, :exception => exception, :data => extra_data))
+    rescue Exception => e # keep going if this fails
+    end
   end
 
+  # Report all exceptions that occur while running the passed-in block.
+  def self.report_exceptions(application_name)
+    begin
+      yield
+    rescue => e
+      report(application_name, e)
+    end
+  end
 end
 
 logfile = File.join(Dir.tmpdir, "exceptions.log")

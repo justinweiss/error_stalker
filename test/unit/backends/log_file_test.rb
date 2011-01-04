@@ -8,7 +8,7 @@ class BackendsLogFileTest < Test::Unit::TestCase
     super
     filename = File.join(Dir.tmpdir, 'exceptions.log')
     @backend = ExceptionLogger::Backends::LogFile.new(filename)
-    @exception_report = ExceptionLogger::ExceptionReport.new(:unit_test, 'Test Exception', :name => 'Bob')
+    @exception_report = ExceptionLogger::ExceptionReport.new(:application => :unit_test, :exception => 'Test Exception', :data => {:name => 'Bob'})
   end
 
   def teardown

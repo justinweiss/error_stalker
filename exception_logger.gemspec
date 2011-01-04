@@ -6,11 +6,11 @@ Gem::Specification.new do |s|
   s.name        = "exception_logger"
   s.version     = ExceptionLogger::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["TODO: Write your name"]
-  s.email       = ["TODO: Write your email address"]
+  s.authors     = ["Justin Weiss"]
+  s.email       = ["jweiss@avvo.com"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{Logs exceptions to a pluggable backend and/or a pluggable store}
+  s.description = %q{Logs exceptions to a pluggable backend. Also provides a server for centralized exception logging using a pluggable data store.}
 
   s.rubyforge_project = "exception_logger"
 
