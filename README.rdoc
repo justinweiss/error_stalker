@@ -1,0 +1,3 @@
+= Exception Logger
+
+As the name says, this library allows you to log exceptions to an arbitrary backend.

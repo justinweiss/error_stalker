@@ -1,0 +1,25 @@
+require 'test_helper'
+require 'exception_logger/backends/log_file'
+require 'tempfile'
+
+class BackendsLogFileTest < Test::Unit::TestCase
+
+  def setup
+    super
+    filename = File.join(Dir.tmpdir, 'exceptions.log')
+    @backend = ExceptionLogger::Backends::LogFile.new(filename)
+    @exception_report = ExceptionLogger::ExceptionReport.new(:unit_test, 'Test Exception', :name => 'Bob')
+  end
+
+  def teardown
+    File.delete(@backend.filename) if File.exists?(@backend.filename)
+    super
+  end
+  
+  def test_report_is_implemented
+    @backend.report(@exception_report)
+    exception_string = File.read(@backend.filename)
+    assert_match /Application: unit_test/, exception_string
+    assert_match /Exception: Test Exception/, exception_string
+  end
+end
