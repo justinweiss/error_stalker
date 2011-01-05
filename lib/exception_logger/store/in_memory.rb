@@ -4,6 +4,7 @@ require 'exception_logger/store/base'
 # exception in a list held in memory.
 class ExceptionLogger::Store::InMemory < ExceptionLogger::Store::Base
   attr_reader :exceptions
+  attr_reader :exception_groups
   
   def initialize
     clear
@@ -12,11 +13,27 @@ class ExceptionLogger::Store::InMemory < ExceptionLogger::Store::Base
   # Store +exception_report+ in the exception list
   def store(exception_report)
     @exceptions << exception_report
+    exception_report.id = exceptions.length - 1
+    exception_groups[exception_report.digest] ||= []
+    exception_groups[exception_report.digest] << exception_report
+    exception_report.id
+  end
+
+  # returns the group this exception is a part of, ordered by
+  # timestamp
+  def group(digest)
+    exception_groups[digest]
   end
   
   # Empty this exception store
   def clear
     @exceptions = []
+    @exception_groups = {}
+  end
+
+  # Find an exception report with the given id
+  def find(id)
+    exceptions[id.to_i]
   end
 
   # Have we logged any exceptions?
@@ -24,8 +41,13 @@ class ExceptionLogger::Store::InMemory < ExceptionLogger::Store::Base
     exceptions.empty?
   end
 
-  # Return the last +limit+ unique exception reports that have been reported.
-  def all(limit = 50)
-    exceptions.reverse[0, 50]
+  # Return recent exceptions grouped by digest
+  def recent
+    data = []
+    exception_groups.map do |digest, group|
+      data << [group.count, group.last]
+    end
+
+    data.reverse
   end
 end

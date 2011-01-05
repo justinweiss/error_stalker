@@ -6,6 +6,7 @@ require 'digest/md5'
 # investigation.
 class ExceptionLogger::ExceptionReport
   attr_reader :application, :machine, :timestamp, :type, :exception, :data, :backtrace
+  attr_accessor :id
 
   # Build a new ExceptionReport. <tt>params[:application]</tt> is a
   # string identifying the application or component the exception was

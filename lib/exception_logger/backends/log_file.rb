@@ -10,6 +10,8 @@ class ExceptionLogger::Backends::LogFile < ExceptionLogger::Backends::Base
     @filename = filename
   end
 
+  # Writes the information contained in +exception_report+ to the log
+  # file specified when this backend was initialized.
   def report(exception_report)
     File.open(filename, 'a') do |file|
       file.puts "Machine: #{exception_report.machine}"

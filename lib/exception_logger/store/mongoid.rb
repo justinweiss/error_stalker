@@ -18,7 +18,7 @@ class ExceptionLogger::Store::Mongoid < ExceptionLogger::Store::Base
 
   # Store +exception_report+ in the exception list
   def store(exception_report)
-    ExceptionReport.create_from_exception_report(exception_report)
+    ExceptionReport.create_from_exception_report(exception_report).id
   end
 
   # Have we logged any exceptions?
@@ -75,7 +75,7 @@ class ExceptionLogger::Store::Mongoid < ExceptionLogger::Store::Base
       end
     end
     
-    scope
+    scope.order_by(:timestamp.desc)
   end
 end
 
@@ -95,14 +95,16 @@ class ExceptionLogger::Store::Mongoid::ExceptionReport
 
   # Create a new mongoid exception report from +exception_report+.
   def self.create_from_exception_report(exception_report)
-    new do |o|
+    object = new do |o|
       [:application, :machine, :timestamp, :type, :exception, :data, :digest].each do |field|
         o.send("#{field}=", exception_report.send(field))
       end
       if exception_report.backtrace
         o.backtrace = exception_report.backtrace.join("\n")
       end
-    end.save
+    end
+    object.save
+    object
   end
 
   def self.applications
@@ -163,6 +165,6 @@ function(key, vals) {
 EOS
     results = collection.map_reduce(map, reduce, {:query => {:timestamp => {"$gt" => 7.days.ago}}, :out => :grouped_exceptions})
     
-    results.find.map {|v| [v["value"]["count"], new(v["value"]["most_recent"])]}
+    results.find.sort(['value.most_recent.timestamp', 'descending']).map {|v| [v["value"]["count"], new(v["value"]["most_recent"])]}
   end
 end

@@ -12,4 +12,13 @@ class ExceptionReportTest < Test::Unit::TestCase
     assert_equal 'Bob', exception_report.data['name']
     assert_equal 'NoMethodError', exception_report.type
   end
+
+  def test_digest
+    report = ExceptionLogger::ExceptionReport.new(:application => :unit_test, :exception => "Bob", :data => {:name => "Bob"})
+    report2 = ExceptionLogger::ExceptionReport.new(:application => :unit_test, :exception => "Bob", :data => {:name => "Bob"})
+    report3 = ExceptionLogger::ExceptionReport.new(:application => :unit_test, :exception => "Fred", :data => {:name => "Bob"})
+
+    assert_equal report.digest, report2.digest
+    assert_not_equal report.digest, report3.digest
+  end
 end

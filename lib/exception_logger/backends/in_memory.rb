@@ -8,7 +8,7 @@ class ExceptionLogger::Backends::InMemory < ExceptionLogger::Backends::Base
     clear
   end
 
-  # Stores exception_report in the exceptions list
+  # Stores exception_report in the exceptions list.
   def report(exception_report)
     @exceptions << exception_report
   end

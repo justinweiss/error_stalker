@@ -15,6 +15,8 @@ class ExceptionLogger::Backends::Server < ExceptionLogger::Backends::Base
     @path = params[:path] || ''
   end
 
+  # Reports +exception_report+ to a centralized
+  # ExceptionLogger::Server.
   def report(exception_report)
     req = Net::HTTP::Post.new("#{path}/report.json")
     req["content-type"] = "application/json"

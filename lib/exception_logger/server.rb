@@ -2,12 +2,14 @@ require 'sinatra/base'
 
 $: << File.expand_path('..', File.dirname(__FILE__))
 require 'exception_logger'
-require 'exception_logger/store/in_memory'
-require 'exception_logger/store/mongoid'
+require 'exception_logger/store'
 require 'erb'
+require 'pony'
 
 module ExceptionLogger
-  
+
+  # The exception_logger server. Provides a UI for browsing, grouping,
+  # and searching exception reports.
   class Server < Sinatra::Base
     attr_accessor :store
 
@@ -35,6 +37,18 @@ module ExceptionLogger
       self.class.configuration || {}
     end
 
+    # Optionally send a mail if it's the first time we've seen this
+    # report
+    def send_email(exception_report)
+      if configuration['email']
+        @report = exception_report
+        Pony.mail(:to => configuration['email']['to'],
+          :from => configuration['email']['from'],
+          :subject => "Exception #{exception_report.machine} - #{exception_report.exception.to_s[0, 64]}",
+          :body => erb(:exception_email))
+      end
+    end
+
     def initialize
       super
       if configuration['store']
@@ -54,7 +68,6 @@ module ExceptionLogger
     end
     
     post '/search' do
-      puts params.inspect
       @results = store.search(params)
       erb :search
     end
@@ -80,7 +93,11 @@ module ExceptionLogger
 
     post '/report.json' do
       report = ExceptionLogger::ExceptionReport.new(JSON.parse(request.body.read))
-      store.store(report)
+      report.id = store.store(report)
+
+      # Only send an email if it's the first exception of this type
+      # we've seen
+      send_email(report) if store.group(report.digest).count == 1
       200
     end
     
