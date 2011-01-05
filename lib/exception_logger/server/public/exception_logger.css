@@ -1,0 +1,142 @@
+body {
+  font-family: Helvetica, Calibri, sans-serif;
+}
+
+h1, h2, h3, h4 {
+  font-color: #222;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  vertical-align: baseline;
+}
+
+h1 {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+h3 {
+  margin-bottom: 4px;
+}
+
+table#exceptions td, table#exceptions th {
+  padding: 10px;
+  height: 80px;
+  
+}
+
+table#exceptions {
+  -moz-box-shadow: 0px 2px 5px #666;
+  -webkit-box-shadow: 0px 2px 5px #666;
+  box-shadow: 0px 2px 5px #666;
+}
+
+table#exceptions, table#exceptions tr:first-child th:first-child {
+  -webkit-border-top-left-radius: 6px;
+  -moz-border-radius-topleft: 6px;
+  border-top-left-radius: 6px;
+}
+
+table#exceptions, table#exceptions tr:first-child th:last-child {
+  -webkit-border-top-right-radius: 6px;
+  -moz-border-radius-topright: 6px;
+  border-top-right-radius: 6px;
+}
+
+table#exceptions th {
+  color: #eee;
+  background-color: #333;
+}
+
+table#exceptions .count {
+  width: 80px;
+  text-align: center;
+}
+
+table#exceptions .last_occurred {
+  width: 240px;
+}
+
+table#exceptions td.last_occurred {
+  font-size: 0.8em;
+}
+
+table#exceptions td.last_occurred .timestamp {
+  font-size: 1.2em;
+}
+
+table#exceptions .exception {
+  width: 480px;
+}
+
+table#exceptions .links {
+  text-align: center;
+  width: 160px;
+}
+
+table#exceptions .details {
+  width: 240px;
+}
+
+
+table#exceptions tr.even {
+  background-color: #ccc;
+}
+
+table#exceptions tr.odd {
+  background-color: #eee;
+}
+
+pre {
+  white-space: pre-wrap; /* css-3 */
+  white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+  white-space: -pre-wrap; /* Opera 4-6 */
+  white-space: -o-pre-wrap; /* Opera 7 */
+  word-wrap: break-word; /* Internet Explorer 5.5+ */
+  padding: 8px;
+  background-color: #ccc;
+  margin: 0px;
+}
+
+code {
+  font-size: 14px;
+  font-family: Inconsolata, Consolas, 'Lucida Console', monospace;
+}
+
+dl.group_details dt {
+  float: left;
+  font-weight: bold;
+}
+
+dl.group_details dd {
+  margin-left: 220px;
+}
+
+#search_form {
+  margin-left: 10px;
+  width: 380px;
+}
+
+#search_form label {
+  width: 140px;
+  margin-right: 10px;
+  display: block;
+  float: left;
+}
+
+#search_form input, #search_form select {
+  width: 220px;
+  margin-left: 10px;
+  float: left;
+}
+
+#search_form input[type=submit] {
+  width: auto;
+  margin: 8px 0px 0px 0px;
+}

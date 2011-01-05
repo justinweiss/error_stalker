@@ -1,4 +1,5 @@
 require 'json'
+require 'digest/md5'
 
 # An ExceptionReport contains the exception data, which can then be
 # transformed into whatever format is needed for further
@@ -26,6 +27,16 @@ class ExceptionLogger::ExceptionReport
     else
       @backtrace = params[:exception].backtrace if exception.is_a?(Exception)
     end
+  end
+
+  STACK_DIGEST_LENGTH = 4096
+
+  # Generate a 'mostly-unique' hash code for this exception, that
+  # should be the same for similar exceptions and different for
+  # different exceptions. This is used to group similar exceptions
+  # together.
+  def digest
+    Digest::MD5.hexdigest((backtrace ? backtrace.to_s[0,STACK_DIGEST_LENGTH] : exception.to_s) + type.to_s)
   end
 
   # Serialize this object to json, so we can send it over the wire

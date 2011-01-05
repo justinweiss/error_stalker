@@ -2,5 +2,16 @@
   
  require File.expand_path('../lib/exception_logger/server', File.dirname(__FILE__))
  require 'vegas'
+
+ ENV['RACK_ENV'] ||= 'development'
  
- Vegas::Runner.new(ExceptionLogger::Server, 'exception_logger_server', :foreground => true)
+ Vegas::Runner.new(ExceptionLogger::Server, 'exception_logger_server', {
+     :foreground => true,
+     :before_run => lambda {|v|
+       config_file = ENV['EXCEPTION_LOGGER_CONFIG'] || v.args.first
+       if config_file
+         params = YAML.load(File.read(config_file))[ENV['RACK_ENV']]
+         ExceptionLogger::Server.configuration = params
+       end
+     }
+   })

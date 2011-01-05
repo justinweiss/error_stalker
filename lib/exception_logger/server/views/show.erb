@@ -1,0 +1,24 @@
+<p><a href="/">Back to list</a></p>
+<h1>Exception in <%= h @report.application %></h1>
+<h3>on <%= h @report.machine %> @ <%= h @report.timestamp %></h3>
+
+<dl class="group_details">
+  <dt>Count</dt><dd><%= h(@group.count) %></dd>
+  <dt>First occurred</dt><dd><%= h(@group.first.timestamp) %></dd>
+  <dt>Most recently occurred</dt><dd><%= h(@group.last.timestamp) %></dd>
+  <dt>On machines</dt><dd><%= h(@group.map(&:machine).uniq.join(', ')) %></dd>
+</dl>
+<p><a href="/similar/<%= @report.digest%>.html">See all</a></p>
+
+
+<h2><%= h @report.exception %></h2>
+
+<% if @report.backtrace %>
+<h3>Stack trace</h3>
+<pre><code><%= @report.backtrace %></code></pre>
+<% end %>
+
+<% if @report.data && !@report.data.empty? %>
+<h3>Additional information</h3>
+<pre><code><%= @report.data.to_yaml %></code></pre>
+<% end %>

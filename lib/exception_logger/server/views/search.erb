@@ -1,0 +1,66 @@
+<p><a href="/">Back to list</a></p>
+<h1>Search</h1>
+
+<div id="search_form" class="clearfix">
+  <form method="post" action="/search">
+    <label for="application">Application</label>
+    <select id="application" name="application">
+      <option value=""></option>
+      <% store.applications.each do |application| %>
+        <option value="<%= application %>" <%= "selected='selected'" if params['application'] == application %>><%= application %></option>
+      <% end %>
+    </select>
+
+    <label for="machine">Machine</label>
+    <select id="machine" name="machine">
+      <option value=""></option>
+      <% store.machines.each do |machine| %>
+        <option value="<%= machine %>" <%= "selected='selected'" if params['machine'] == machine %>><%= machine %></option>
+      <% end %>
+    </select>
+
+    <label for="exception">Message</label>
+    <input id="exception" type="text" name="exception" value="<%= params[:exception] %>" />
+
+    <label for="type">Type</label>
+    <input id="type" type="text" name="type" value="<%= params[:type] %>" />
+
+    <label for="data">Extra data (key:"value")</label>
+    <input id="data" type="text" name="data" value="<%= params[:data] %>" />
+    
+    <input type="submit" name="Search" value="Search" />
+  </form>
+</div>
+
+<% if @results %>
+  <h2>Search results</h2>
+  <table id="exceptions" cellpadding="0">
+    <tr>
+      <th class="count">&nbsp;</th>
+      <th class="last_occurred">Occurred</th>
+      <th class="exception">Exception</th>
+      <th class="links">&nbsp;</th>
+    </tr>
+    <% @results.each_with_index do |report, i| %>
+      <tr id="<%= report.id %>" class="<%= i.even? ? 'even' : 'odd' %>">
+        <td class="count">&nbsp;</td>
+        <td class="last_occurred">
+          <span class="timestamp"><%= report.timestamp %></span><br />
+          <%= report.application %><br />
+          <%= report.machine %><br />
+        </td>
+        <td class="exception">
+          <%= report.exception %>
+          <% if report.backtrace %>
+            <br />
+            <a href="javascript:$('tr#<%= report.id%> .stacktrace').toggle();">Stack trace</a>
+            <div class="stacktrace" style="display:none">
+              <pre><code><%= h report.backtrace %></code></pre>
+            </div>
+          <% end %>
+        </td>
+        <td class="links"><a href="/exceptions/<%= report.id %>.html">View</a></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>

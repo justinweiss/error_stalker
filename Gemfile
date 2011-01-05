@@ -7,4 +7,5 @@ group :server do
   gem 'sinatra', '~>1.1.2'
   gem 'vegas', '~>0.1.8'
   gem 'thin', '~>1.2.7'
+  gem 'mongoid', '~>2.0.0.beta.20'
 end

@@ -3,7 +3,7 @@ require 'exception_logger/store/base'
 # The simplest exception store. This just stores each reported
 # exception in a list held in memory.
 class ExceptionLogger::Store::InMemory < ExceptionLogger::Store::Base
-  attr_accessor :exceptions
+  attr_reader :exceptions
   
   def initialize
     clear
@@ -19,8 +19,13 @@ class ExceptionLogger::Store::InMemory < ExceptionLogger::Store::Base
     @exceptions = []
   end
 
-  # Return all the exception reports that have been reported.
-  def all
-    exceptions
+  # Have we logged any exceptions?
+  def empty?
+    exceptions.empty?
+  end
+
+  # Return the last +limit+ unique exception reports that have been reported.
+  def all(limit = 50)
+    exceptions.reverse[0, 50]
   end
 end
