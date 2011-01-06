@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    exception_logger (0.0.1)
+    exceptionl (0.0.1)
 
 GEM
   remote: http://rubygems.org/
@@ -22,6 +22,8 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.16)
+    mocha (0.9.10)
+      rake
     mongo (1.1.5)
       bson (>= 1.1.5)
     mongoid (2.0.0.beta.20)
@@ -35,6 +37,7 @@ GEM
     rack (1.2.1)
     rack-test (0.5.7)
       rack (>= 1.0)
+    rake (0.8.7)
     sinatra (1.1.2)
       rack (~> 1.1)
       tilt (~> 1.2)
@@ -54,10 +57,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  exception_logger!
+  exceptionl!
+  mocha (~> 0.9.10)
   mongoid (~> 2.0.0.beta.20)
   pony (~> 1.1)
-  rack-test
+  rack-test (~> 0.5.7)
   sinatra (~> 1.1.2)
   thin (~> 1.2.7)
   vegas (~> 0.1.8)

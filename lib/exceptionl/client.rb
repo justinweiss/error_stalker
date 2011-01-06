@@ -1,6 +1,5 @@
 require 'exceptionl/exception_report'
-require 'exceptionl/backends/base'
-require 'exceptionl/backends/log_file'
+require 'exceptionl/backends'
 require 'tempfile'
 
 # This class implements the client-side exception logging
