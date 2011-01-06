@@ -35,6 +35,6 @@ end
 logfile = File.join(Dir.tmpdir, "exceptions.log")
 
 # let's put this in a better place if we're using rails
-logfile = Rails.root + 'exceptions.log' if defined?(Rails)
+logfile = Rails.root + 'log/exceptions.log' if defined?(Rails)
 
 Exceptionl::Client.backend = Exceptionl::Backends::LogFile.new(logfile)

@@ -20,13 +20,19 @@ class Exceptionl::ExceptionReport
     @machine = params[:machine] || machine_name
     @timestamp = params[:timestamp] || Time.now
     @type = params[:type] || params[:exception].class.name
-    @exception = params[:exception] || params[:exception].to_s
+
+    if params[:exception].is_a?(Exception)
+      @exception = params[:exception].to_s
+    else
+      @exception = params[:exception]
+    end
+    
     @data = params[:data]
     
     if params[:backtrace]
       @backtrace = params[:backtrace]
     else
-      @backtrace = params[:exception].backtrace if exception.is_a?(Exception)
+      @backtrace = params[:exception].backtrace if params[:exception].is_a?(Exception)
     end
   end
 

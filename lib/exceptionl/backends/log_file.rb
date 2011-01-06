@@ -22,7 +22,7 @@ class Exceptionl::Backends::LogFile < Exceptionl::Backends::Base
       file.puts "Data: #{YAML.dump(exception_report.data)}"
       if exception_report.backtrace
         file.puts "Stack trace:"
-        file.puts exception_report.backtrace.join('\n')
+        file.puts exception_report.backtrace.join("\n")
       end
       file.puts
     end
