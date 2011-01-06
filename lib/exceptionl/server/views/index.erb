@@ -1,8 +1,10 @@
 <h1>Recent Exceptions</h1>
 
-<p><a href="/search">Search</a></p>
+<% if store.empty? %>
+  <p>No exceptions yet. You're just that awesome.</p>
+<% else %>
+  <p><a href="/search">Search</a></p>
 
-<% unless store.empty? %>
   <table id="exceptions" cellpadding="0">
     <tr>
       <th class="count">Count</th>
