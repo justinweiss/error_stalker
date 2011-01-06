@@ -1,9 +1,9 @@
 require 'mongoid'
-require 'exception_logger/store/base'
+require 'exceptionl/store/base'
 
 # Store exceptions using MongoDB. This store provides fast storage and
 # querying of exceptions, and long-term persistence.
-class ExceptionLogger::Store::Mongoid < ExceptionLogger::Store::Base
+class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
   
   # Configure mongoid from the mongoid config file found in
   # +config_file+.
@@ -79,10 +79,10 @@ class ExceptionLogger::Store::Mongoid < ExceptionLogger::Store::Base
   end
 end
 
-# The mongoid version of ExceptionLogger::ExceptionReport. This class
+# The mongoid version of Exceptionl::ExceptionReport. This class
 # is used for mongo-specific querying and persistence of
 # ExceptionReports, while base ExceptionReports are store-agnostic.
-class ExceptionLogger::Store::Mongoid::ExceptionReport
+class Exceptionl::Store::Mongoid::ExceptionReport
   include Mongoid::Document
   field :application
   field :machine

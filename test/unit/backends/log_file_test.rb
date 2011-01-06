@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'exception_logger/backends/log_file'
+require 'exceptionl/backends/log_file'
 require 'tempfile'
 
 class BackendsLogFileTest < Test::Unit::TestCase
@@ -7,8 +7,8 @@ class BackendsLogFileTest < Test::Unit::TestCase
   def setup
     super
     filename = File.join(Dir.tmpdir, 'exceptions.log')
-    @backend = ExceptionLogger::Backends::LogFile.new(filename)
-    @exception_report = ExceptionLogger::ExceptionReport.new(:application => :unit_test, :exception => 'Test Exception', :data => {:name => 'Bob'})
+    @backend = Exceptionl::Backends::LogFile.new(filename)
+    @exception_report = Exceptionl::ExceptionReport.new(:application => :unit_test, :exception => 'Test Exception', :data => {:name => 'Bob'})
   end
 
   def teardown

@@ -1,4 +1,4 @@
-module ExceptionLogger::Store
+module Exceptionl::Store
 
   # The base store that all other exception stores should inherit
   # from.

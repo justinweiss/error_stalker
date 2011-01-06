@@ -1,7 +1,7 @@
 require 'yaml'
 
 # Provides a backend that logs all exception data to a file.
-class ExceptionLogger::Backends::LogFile < ExceptionLogger::Backends::Base
+class Exceptionl::Backends::LogFile < Exceptionl::Backends::Base
 
   attr_reader :filename
 

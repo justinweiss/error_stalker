@@ -1,6 +1,6 @@
 # Provides an in-memory backend that stores all exception reports in
 # an array.
-class ExceptionLogger::Backends::InMemory < ExceptionLogger::Backends::Base
+class Exceptionl::Backends::InMemory < Exceptionl::Backends::Base
 
   attr_reader :exceptions
 

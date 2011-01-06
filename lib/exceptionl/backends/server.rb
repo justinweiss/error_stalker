@@ -2,7 +2,7 @@ require 'json'
 require 'net/http'
 
 # Provides a backend that logs all exception data to a file.
-class ExceptionLogger::Backends::Server < ExceptionLogger::Backends::Base
+class Exceptionl::Backends::Server < Exceptionl::Backends::Base
 
   attr_accessor :host, :port, :protocol, :path 
   
@@ -16,7 +16,7 @@ class ExceptionLogger::Backends::Server < ExceptionLogger::Backends::Base
   end
 
   # Reports +exception_report+ to a centralized
-  # ExceptionLogger::Server.
+  # Exceptionl::Server.
   def report(exception_report)
     req = Net::HTTP::Post.new("#{path}/report.json")
     req["content-type"] = "application/json"

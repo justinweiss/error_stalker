@@ -4,7 +4,7 @@ require 'digest/md5'
 # An ExceptionReport contains the exception data, which can then be
 # transformed into whatever format is needed for further
 # investigation.
-class ExceptionLogger::ExceptionReport
+class Exceptionl::ExceptionReport
   attr_reader :application, :machine, :timestamp, :type, :exception, :data, :backtrace
   attr_accessor :id
 

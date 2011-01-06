@@ -1,16 +1,16 @@
 require 'test_helper'
-require 'exception_logger/backends/in_memory'
+require 'exceptionl/backends/in_memory'
 
 class ClientTest < Test::Unit::TestCase
 
   def setup
     super
-    @backend = ExceptionLogger::Backends::InMemory.new
-    ExceptionLogger::Client.backend = @backend
+    @backend = Exceptionl::Backends::InMemory.new
+    Exceptionl::Client.backend = @backend
   end
   
   def test_report
-    ExceptionLogger::Client.report(:unit_test, new_exception, {:name => "Bob"})
+    Exceptionl::Client.report(:unit_test, new_exception, {:name => "Bob"})
 
     assert_equal 1, @backend.exceptions.length
     exception_report = @backend.exceptions.first
@@ -22,7 +22,7 @@ class ClientTest < Test::Unit::TestCase
   end
 
   def test_report_exceptions_in_block
-    ExceptionLogger::Client.report_exceptions(:unit_test) do
+    Exceptionl::Client.report_exceptions(:unit_test) do
       raise new_exception
     end
 
@@ -30,10 +30,10 @@ class ClientTest < Test::Unit::TestCase
   end
 
   def test_dont_raise_exceptions_during_report
-    ExceptionLogger::Client.backend = nil
+    Exceptionl::Client.backend = nil
     
     assert_nothing_raised do
-      ExceptionLogger::Client.report(:unit_test, new_exception, {:name => "Bob"})
+      Exceptionl::Client.report(:unit_test, new_exception, {:name => "Bob"})
     end
   end
 

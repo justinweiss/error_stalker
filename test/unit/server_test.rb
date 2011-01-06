@@ -1,6 +1,6 @@
 require 'test_helper'
 require 'rack/test'
-require 'exception_logger/server'
+require 'exceptionl/server'
 require 'mocha'
 
 ENV['RACK_ENV'] = 'test'
@@ -9,12 +9,12 @@ class ServerTest < Test::Unit::TestCase
   include Rack::Test::Methods
 
   def app
-    ExceptionLogger::Server
+    Exceptionl::Server
   end
 
   def setup
-    @store = ExceptionLogger::Store::InMemory.new
-    ExceptionLogger::Server.any_instance.stubs(:store).returns(@store)
+    @store = Exceptionl::Store::InMemory.new
+    Exceptionl::Server.any_instance.stubs(:store).returns(@store)
   end
 
   def test_report_exception
@@ -76,7 +76,7 @@ class ServerTest < Test::Unit::TestCase
       begin
         raise NoMethodError, message
       rescue => ex
-        e = ExceptionLogger::ExceptionReport.new(:exception => ex, :application => 'test', :data => data)
+        e = Exceptionl::ExceptionReport.new(:exception => ex, :application => 'test', :data => data)
       end
       
       post '/report.json', e.to_json

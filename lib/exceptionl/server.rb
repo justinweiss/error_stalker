@@ -1,14 +1,14 @@
 require 'sinatra/base'
 
 $: << File.expand_path('..', File.dirname(__FILE__))
-require 'exception_logger'
-require 'exception_logger/store'
+require 'exceptionl'
+require 'exceptionl/store'
 require 'erb'
 require 'pony'
 
-module ExceptionLogger
+module Exceptionl
 
-  # The exception_logger server. Provides a UI for browsing, grouping,
+  # The exceptionl server. Provides a UI for browsing, grouping,
   # and searching exception reports.
   class Server < Sinatra::Base
     attr_accessor :store
@@ -55,7 +55,7 @@ module ExceptionLogger
         store_class = configuration['store']['class'].split('::').inject(Object) {|mod, string| mod.const_get(string)}
         self.store = store_class.new(*Array(configuration['store']['parameters']))
       else
-        self.store = ExceptionLogger::Store::InMemory.new
+        self.store = Exceptionl::Store::InMemory.new
       end
     end
     
@@ -92,7 +92,7 @@ module ExceptionLogger
     end
 
     post '/report.json' do
-      report = ExceptionLogger::ExceptionReport.new(JSON.parse(request.body.read))
+      report = Exceptionl::ExceptionReport.new(JSON.parse(request.body.read))
       report.id = store.store(report)
 
       # Only send an email if it's the first exception of this type

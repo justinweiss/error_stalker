@@ -1,8 +1,8 @@
-require 'exception_logger/store/base'
+require 'exceptionl/store/base'
 
 # The simplest exception store. This just stores each reported
 # exception in a list held in memory.
-class ExceptionLogger::Store::InMemory < ExceptionLogger::Store::Base
+class Exceptionl::Store::InMemory < Exceptionl::Store::Base
   attr_reader :exceptions
   attr_reader :exception_groups
   

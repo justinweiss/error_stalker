@@ -1,12 +1,12 @@
-require 'exception_logger/exception_report'
-require 'exception_logger/backends/base'
-require 'exception_logger/backends/log_file'
+require 'exceptionl/exception_report'
+require 'exceptionl/backends/base'
+require 'exceptionl/backends/log_file'
 require 'tempfile'
 
 # This class implements the client-side exception logging
 # functionality. By default, it logs exceptions to a log file, though
 # this can be overridden.
-class ExceptionLogger::Client
+class Exceptionl::Client
 
   # Sets the backend the client will use to report exceptions to
   # +new_backend+
@@ -17,7 +17,7 @@ class ExceptionLogger::Client
   # Report an exception to the exception logging backend.
   def self.report(application_name, exception, extra_data = {})
     begin
-      @backend.report(ExceptionLogger::ExceptionReport.new(:application => application_name, :exception => exception, :data => extra_data))
+      @backend.report(Exceptionl::ExceptionReport.new(:application => application_name, :exception => exception, :data => extra_data))
     rescue Exception => e # keep going if this fails
     end
   end
@@ -37,4 +37,4 @@ logfile = File.join(Dir.tmpdir, "exceptions.log")
 # let's put this in a better place if we're using rails
 logfile = Rails.root + 'exceptions.log' if defined?(Rails)
 
-ExceptionLogger::Client.backend = ExceptionLogger::Backends::LogFile.new(logfile)
+Exceptionl::Client.backend = Exceptionl::Backends::LogFile.new(logfile)
