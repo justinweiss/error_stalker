@@ -1,0 +1,18 @@
+<%= h @error if @error %>
+
+<h1>Import into Lighthouse</h1>
+
+<div id="lighthouse_form" class="clearfix">
+  <form method="post" action="/lighthouse/report/<%= @exception.id %>.html">
+    <label for="title">Title</label>
+    <input id="title" type="text" name="title" value="<%= @ticket.title %>" />
+
+    <label for="tags">Tags</label>
+    <input id="tags" type="text" name="tags" value="<%= @ticket.tags %>" />
+    
+    <label for="body">Body</label>
+    <textarea id="body" name="body"><%= @ticket.body %></textarea>
+    
+    <input type="submit" name="Create" value="Create" />
+  </form>
+</div>

@@ -122,6 +122,7 @@ code {
 }
 
 dl.group_details dt {
+  clear: left;
   float: left;
   font-weight: bold;
 }
@@ -130,25 +131,33 @@ dl.group_details dd {
   margin-left: 220px;
 }
 
-#search_form {
+form {
   margin-left: 10px;
   width: 380px;
 }
 
-#search_form label {
+form label {
   width: 140px;
   margin-right: 10px;
   display: block;
   float: left;
 }
 
-#search_form input, #search_form select {
+form input, #search_form select {
   width: 220px;
   margin-left: 10px;
   float: left;
 }
 
-#search_form input[type=submit] {
+form textarea {
+  width: 220px;
+  height: 80px;
+  margin-left: 10px;
+  float: left;
+}
+
+form input[type=submit] {
+  clear: left;
   width: auto;
   margin: 8px 0px 0px 0px;
 }

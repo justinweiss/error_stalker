@@ -1,3 +1,5 @@
+require 'exceptionl/exception_group'
+
 module Exceptionl::Store
 
   # The base store that all other exception stores should inherit

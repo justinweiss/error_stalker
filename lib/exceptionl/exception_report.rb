@@ -16,11 +16,12 @@ class Exceptionl::ExceptionReport
   # along with this report.
   def initialize(params = {})
     params = symbolize_keys(params)
+    @id = params[:id]
     @application = params[:application]
     @machine = params[:machine] || machine_name
     @timestamp = params[:timestamp] || Time.now
     @type = params[:type] || params[:exception].class.name
-
+    
     if params[:exception].is_a?(Exception)
       @exception = params[:exception].to_s
     else
@@ -34,6 +35,8 @@ class Exceptionl::ExceptionReport
     else
       @backtrace = params[:exception].backtrace if params[:exception].is_a?(Exception)
     end
+
+    @digest = params[:digest] if params[:digest]
   end
 
   STACK_DIGEST_LENGTH = 4096
@@ -43,7 +46,7 @@ class Exceptionl::ExceptionReport
   # different exceptions. This is used to group similar exceptions
   # together.
   def digest
-    Digest::MD5.hexdigest((backtrace ? backtrace.to_s[0,STACK_DIGEST_LENGTH] : exception.to_s) + type.to_s)
+    @digest ||= Digest::MD5.hexdigest((backtrace ? backtrace.to_s[0,STACK_DIGEST_LENGTH] : exception.to_s) + type.to_s)
   end
 
   # Serialize this object to json, so we can send it over the wire

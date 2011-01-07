@@ -3,6 +3,7 @@ require 'sinatra/base'
 $: << File.expand_path('..', File.dirname(__FILE__))
 require 'exceptionl'
 require 'exceptionl/store'
+require 'exceptionl/plugin'
 require 'erb'
 require 'pony'
 require 'will_paginate'
@@ -25,12 +26,14 @@ WillPaginate::ViewHelpers::LinkRenderer.class_eval do
 end
 
 module Exceptionl
-
+  PER_PAGE = 25
+  
   # The exceptionl server. Provides a UI for browsing, grouping,
   # and searching exception reports.
   class Server < Sinatra::Base
     attr_accessor :store
-
+    attr_accessor :plugins
+    
     set :root, File.dirname(__FILE__)
     set :public, Proc.new { File.join(root, "server/public") }
     set :views, Proc.new { File.join(root, "server/views") }
@@ -89,21 +92,28 @@ module Exceptionl
 
     def initialize
       super
+      self.plugins = []
+      if configuration['plugin']
+        configuration['plugin'].each do |config|
+          plugin_class = config['class'].split('::').inject(Object) {|mod, string| mod.const_get(string)}
+          self.plugins << plugin_class.new(self, config['parameters'])
+        end
+      end
       self.store = self.class.store
     end
     
     get '/' do
-      @records = store.recent(:page => params[:page])
+      @records = store.recent.paginate(:page => params[:page], :per_page => PER_PAGE)
       erb :index
     end
 
     get '/search' do
-      @results = store.search(params) if params["Search"]
+      @results = store.search(params).paginate(:page => params[:page], :per_page => PER_PAGE) if params["Search"]
       erb :search
     end
     
     get '/similar/:digest.html' do
-      @group = store.group(params[:digest])
+      @group = store.group(params[:digest]).paginate(:page => params[:page], :per_page => PER_PAGE)
       if @group
         erb :similar
       else

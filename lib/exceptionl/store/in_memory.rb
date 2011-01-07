@@ -46,9 +46,14 @@ class Exceptionl::Store::InMemory < Exceptionl::Store::Base
   def recent(params = {})
     data = []
     exception_groups.map do |digest, group|
-      data << [group.count, group.last]
+      data << Exceptionl::ExceptionGroup.new.tap do |g|
+        g.count = group.length
+        g.digest = digest
+        g.timestamp = group.last.timestamp
+        g.most_recent_report = group.last
+      end
     end
      
-    data.reverse.paginate(:page => params[:page], :per_page => PER_PAGE)
+    data.reverse
   end
 end

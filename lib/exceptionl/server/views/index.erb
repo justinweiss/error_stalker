@@ -13,17 +13,16 @@
       <th class="exception">Exception</th>
       <th class="links">&nbsp;</th>
     </tr>
-    <% @records.each_with_index do |recent_group, i| %>
-      <% count, most_recent = recent_group %>
+    <% @records.each_with_index do |group, i| %>
       <tr class="<%= i.even? ? 'even' : 'odd' %>">
-        <td class="count"><%= count.to_i %></td>
+        <td class="count"><%= group.count.to_i %></td>
         <td class="last_occurred">
-          <span class="timestamp"><%= h most_recent.timestamp %></span><br />
-          <%= h most_recent.application %><br />
-          <%= h most_recent.machine %><br />
+          <span class="timestamp"><%= h group.most_recent_report.timestamp %></span><br />
+          <%= h group.most_recent_report.application %><br />
+          <%= h group.most_recent_report.machine %><br />
         </td>
-        <td class="exception"><div><%= h most_recent.exception %></td>
-        <td class="links"><a href="/exceptions/<%= most_recent.id %>.html">View</a> | <a href="/similar/<%= most_recent.digest %>.html">See all</a></td>
+        <td class="exception"><div><%= h group.most_recent_report.exception %></td>
+        <td class="links"><a href="/exceptions/<%= group.most_recent_report.id %>.html">View</a> | <a href="/similar/<%= group.digest %>.html">See all</a></td>
       </tr>
     <% end %>
   </table>

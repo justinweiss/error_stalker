@@ -9,6 +9,13 @@
   <dt>On machines</dt><dd><%= h(@group.map(&:machine).uniq.join(', ')) %></dd>
 </dl>
 <p><a href="/similar/<%= @report.digest%>.html">See all</a></p>
+<% plugins.each do |plugin| %>
+  <% if plugin.respond_to?(:exception_links) %>
+    <% plugin.exception_links(@report).each do |name, href| %>
+      <p><a href="<%= href %>"><%= name %></a></p>
+    <% end %>
+  <% end %>
+<% end %>
 
 
 <h2><%= h @report.exception %></h2>
