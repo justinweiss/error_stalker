@@ -5,6 +5,26 @@ require 'exceptionl'
 require 'exceptionl/store'
 require 'erb'
 require 'pony'
+require 'will_paginate'
+require 'will_paginate/view_helpers/base'
+require 'will_paginate/view_helpers/link_renderer'
+
+WillPaginate::ViewHelpers::LinkRenderer.class_eval do
+  protected
+  def url(page)
+    url = @template.request.url
+    if page == 1
+      # strip out page param and trailing ? if it exists
+      url.gsub(/page=[0-9]+/, '').gsub(/\?$/, '')
+    else
+      if url =~ /page=[0-9]+/
+        url.gsub(/page=[0-9]+/, "page=#{page}")
+      else
+        url + "?page=#{page}"
+      end      
+    end
+  end
+end
 
 module Exceptionl
 
@@ -20,6 +40,8 @@ module Exceptionl
     helpers do
       include Rack::Utils
       alias_method :h, :escape_html
+
+      include WillPaginate::ViewHelpers::Base
       
       def url(*path_parts)
         u = '/' + path_parts.join("/")
@@ -27,14 +49,32 @@ module Exceptionl
         u
       end
       alias_method :u, :url
+
+      def cutoff(str, limit = 100)
+        if str.length > limit
+          str[0, limit] + '...'
+        else
+          str
+        end
+      end
     end
 
     class << self
       attr_accessor :configuration
     end
+    self.configuration = {}
+
+    def self.store
+      if configuration['store']
+        store_class = configuration['store']['class'].split('::').inject(Object) {|mod, string| mod.const_get(string)}
+        store_class.new(*Array(configuration['store']['parameters']))
+      else
+        Exceptionl::Store::InMemory.new
+      end
+    end
     
     def configuration
-      self.class.configuration || {}
+      self.class.configuration
     end
 
     # Optionally send a mail if it's the first time we've seen this
@@ -51,15 +91,12 @@ module Exceptionl
 
     def initialize
       super
-      if configuration['store']
-        store_class = configuration['store']['class'].split('::').inject(Object) {|mod, string| mod.const_get(string)}
-        self.store = store_class.new(*Array(configuration['store']['parameters']))
-      else
-        self.store = Exceptionl::Store::InMemory.new
-      end
+      self.store = self.class.store
     end
     
     get '/' do
+      @records = store.recent(:page => params[:page])
+      puts @records.total_pages
       erb :index
     end
 

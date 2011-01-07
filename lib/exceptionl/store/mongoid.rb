@@ -4,6 +4,7 @@ require 'exceptionl/store/base'
 # Store exceptions using MongoDB. This store provides fast storage and
 # querying of exceptions, and long-term persistence.
 class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
+  PER_PAGE = 50
   
   # Configure mongoid from the mongoid config file found in
   # +config_file+.
@@ -18,7 +19,16 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
 
   # Store +exception_report+ in the exception list
   def store(exception_report)
-    ExceptionReport.create_from_exception_report(exception_report).id
+    report = ExceptionReport.create_from_exception_report(exception_report)
+    RecentExceptions.collection.update(
+      {:digest => report.digest},
+      {
+        '$inc' => {:count => 1},
+        '$set' => {:most_recent_report_id => report.id, :timestamp => report.timestamp},
+      },
+      :upsert => true)
+
+    report.id
   end
 
   # Have we logged any exceptions?
@@ -27,8 +37,21 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
   end
 
   # Return the last +limit+ unique exception reports that have been reported.
-  def recent
-    ExceptionReport.recent
+  def recent(params = {})
+    recent = RecentExceptions.where(:timestamp.gt => 7.days.ago).order_by(:timestamp.desc).paginate(:page => params[:page], :per_page => PER_PAGE)
+
+    exceptions = ExceptionReport.where(:_id.in => recent.map(&:most_recent_report_id))
+    
+    # Fake association preloading
+    id_map = {}.tap do |h|
+      exceptions.each do |ex|
+        h[ex.id] = ex
+      end
+    end
+
+    WillPaginate::Collection.create(recent.current_page, recent.per_page, recent.total_entries) do |pager|
+      pager.replace(recent.map {|r| [r.count, id_map[r.most_recent_report_id]]})
+    end
   end
 
   # Find an exception report with the given id.
@@ -48,8 +71,8 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
   
   # returns the group this exception is a part of, ordered by
   # timestamp
-  def group(digest)
-    ExceptionReport.where(:digest => digest).order_by(:timestamp.desc)
+  def group(digest, params = {})
+    ExceptionReport.where(:digest => digest).order_by(:timestamp.desc).paginate(:page => params[:page], :per_page => PER_PAGE)
   end
 
   # Searches for exception reports maching +params+.
@@ -75,8 +98,24 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
       end
     end
     
-    scope.order_by(:timestamp.desc)
+    scope.order_by(:timestamp.desc).paginate(:page => params[:page], :per_page => PER_PAGE)
   end
+
+  # Creates the MongoDB indexes used by this driver.
+  def create_indexes
+    Exceptionl::Store::Mongoid::ExceptionReport.create_indexes
+    Exceptionl::Store::Mongoid::RecentExceptions.create_indexes
+  end
+end
+
+# Aggregates exceptions for for the 'recent exceptions' list.
+class Exceptionl::Store::Mongoid::RecentExceptions
+  include Mongoid::Document
+  field :count, :type => Integer
+  field :ordinal
+  field :timestamp, :type => Time
+  index :ordinal
+  index :timestamp
 end
 
 # The mongoid version of Exceptionl::ExceptionReport. This class
@@ -93,12 +132,17 @@ class Exceptionl::Store::Mongoid::ExceptionReport
   field :backtrace
   field :digest
 
+  index :digest
+  index :data
+  index :timestamp
+
   # Create a new mongoid exception report from +exception_report+.
   def self.create_from_exception_report(exception_report)
     object = new do |o|
       [:application, :machine, :timestamp, :type, :exception, :data, :digest].each do |field|
         o.send("#{field}=", exception_report.send(field))
       end
+      
       if exception_report.backtrace
         o.backtrace = exception_report.backtrace.join("\n")
       end

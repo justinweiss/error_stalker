@@ -15,10 +15,10 @@
 
 <% if @report.backtrace %>
 <h3>Stack trace</h3>
-<pre><code><%= @report.backtrace %></code></pre>
+<pre><code><%= h @report.backtrace %></code></pre>
 <% end %>
 
 <% if @report.data && !@report.data.empty? %>
 <h3>Additional information</h3>
-<pre><code><%= @report.data.to_yaml %></code></pre>
+<pre><code><%= h @report.data.to_yaml %></code></pre>
 <% end %>

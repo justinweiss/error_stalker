@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require File.expand_path('../lib/exceptionl/server', File.dirname(__FILE__))
+
+ENV['RACK_ENV'] ||= 'development'
+
+if ARGV.length != 1
+  puts "Usage: create_indexes </path/to/exceptionl/config.yml>"
+  exit(1)
+end
+
+Exceptionl::Server.configuration = YAML.load(File.read(ARGV[0]))[ENV['RACK_ENV']]
+store = Exceptionl::Server.store
+store.create_indexes if store.respond_to?(:create_indexes)
