@@ -3,6 +3,7 @@ require 'exceptionl/store/base'
 # The simplest exception store. This just stores each reported
 # exception in a list held in memory.
 class Exceptionl::Store::InMemory < Exceptionl::Store::Base
+  PER_PAGE = 25
   attr_reader :exceptions
   attr_reader :exception_groups
   
@@ -21,8 +22,8 @@ class Exceptionl::Store::InMemory < Exceptionl::Store::Base
 
   # returns the group this exception is a part of, ordered by
   # timestamp
-  def group(digest)
-    exception_groups[digest]
+  def group(digest, params = {})
+    exception_groups[digest].paginate(:page => params[:page], :per_page => PER_PAGE)
   end
   
   # Empty this exception store
@@ -42,12 +43,12 @@ class Exceptionl::Store::InMemory < Exceptionl::Store::Base
   end
 
   # Return recent exceptions grouped by digest
-  def recent
+  def recent(params = {})
     data = []
     exception_groups.map do |digest, group|
       data << [group.count, group.last]
     end
-
-    data.reverse
+     
+    data.reverse.paginate(:page => params[:page], :per_page => PER_PAGE)
   end
 end
