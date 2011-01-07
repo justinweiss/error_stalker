@@ -1,5 +1,6 @@
 require 'mongoid'
 require 'exceptionl/store/base'
+Mongoid.logger.level = Logger::WARN
 
 # Store exceptions using MongoDB. This store provides fast storage and
 # querying of exceptions, and long-term persistence.
@@ -20,7 +21,7 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
   # Store +exception_report+ in the exception list
   def store(exception_report)
     report = ExceptionReport.create_from_exception_report(exception_report)
-    RecentExceptions.collection.update(
+    RecentException.collection.update(
       {:digest => report.digest},
       {
         '$inc' => {:count => 1},
@@ -28,17 +29,27 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
       },
       :upsert => true)
 
+    Machine.collection.update(
+      {:name => report.machine},
+      {:name => report.machine},
+      :upsert => true)
+    
+    Application.collection.update(
+      {:name => report.application},
+      {:name => report.application},
+      :upsert => true)
+
     report.id
   end
 
   # Have we logged any exceptions?
   def empty?
-    ExceptionReport.count == 0
+    RecentException.where(:timestamp.gt => 7.days.ago).count == 0
   end
 
   # Return the last +limit+ unique exception reports that have been reported.
   def recent(params = {})
-    recent = RecentExceptions.where(:timestamp.gt => 7.days.ago).order_by(:timestamp.desc).paginate(:page => params[:page], :per_page => PER_PAGE)
+    recent = RecentException.where(:timestamp.gt => 7.days.ago).order_by(:timestamp.desc).paginate(:page => params[:page], :per_page => PER_PAGE)
 
     exceptions = ExceptionReport.where(:_id.in => recent.map(&:most_recent_report_id))
     
@@ -59,14 +70,14 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
     ExceptionReport.find(id)
   end
 
-  # All applications that have been seen in this report
+  # All applications that have been seen by this store
   def applications
-    ExceptionReport.applications
+    Application.all.map(&:name)
   end
 
-  # All machines that have seen this exception
+  # All machines that have been seen by this store
   def machines
-    ExceptionReport.machines
+    Machine.all.map(&:name)
   end
   
   # returns the group this exception is a part of, ordered by
@@ -108,8 +119,18 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
   end
 end
 
+class Exceptionl::Store::Mongoid::Application
+  include Mongoid::Document
+  field :name
+end
+
+class Exceptionl::Store::Mongoid::Machine
+  include Mongoid::Document
+  field :name
+end
+
 # Aggregates exceptions for for the 'recent exceptions' list.
-class Exceptionl::Store::Mongoid::RecentExceptions
+class Exceptionl::Store::Mongoid::RecentException
   include Mongoid::Document
   field :count, :type => Integer
   field :ordinal

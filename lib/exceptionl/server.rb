@@ -21,7 +21,7 @@ WillPaginate::ViewHelpers::LinkRenderer.class_eval do
         url.gsub(/page=[0-9]+/, "page=#{page}")
       else
         url + "?page=#{page}"
-      end      
+      end
     end
   end
 end
@@ -96,7 +96,6 @@ module Exceptionl
     
     get '/' do
       @records = store.recent(:page => params[:page])
-      puts @records.total_pages
       erb :index
     end
 
