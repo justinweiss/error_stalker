@@ -2,7 +2,7 @@
 <h1>Search</h1>
 
 <div id="search_form" class="clearfix">
-  <form method="post" action="/search">
+  <form method="get" action="/search">
     <label for="application">Application</label>
     <select id="application" name="application">
       <option value=""></option>
@@ -34,7 +34,7 @@
 
 <% if @results %>
   <h2>Search results</h2>
-  <p class="pagination"><%= will_paginate @results %></p>
+  <p class="pagination"><%= will_paginate @results, :params => params %></p>
   <table id="exceptions" cellpadding="0">
     <tr>
       <th class="count">&nbsp;</th>

@@ -1,6 +1,5 @@
 require 'mongoid'
 require 'exceptionl/store/base'
-Mongoid.logger.level = Logger::WARN
 
 # Store exceptions using MongoDB. This store provides fast storage and
 # querying of exceptions, and long-term persistence.

@@ -13,16 +13,14 @@ WillPaginate::ViewHelpers::LinkRenderer.class_eval do
   protected
   def url(page)
     url = @template.request.url
+    params = @template.request.params.dup
     if page == 1
-      # strip out page param and trailing ? if it exists
-      url.gsub(/page=[0-9]+/, '').gsub(/\?$/, '')
+      params.delete("page")
     else
-      if url =~ /page=[0-9]+/
-        url.gsub(/page=[0-9]+/, "page=#{page}")
-      else
-        url + "?page=#{page}"
-      end
+      params["page"] = page
     end
+
+    @template.request.path + "?" + params.map {|k, v| "#{Rack::Utils.escape(k)}=#{Rack::Utils.escape(v)}"}.join("&")
   end
 end
 
@@ -100,11 +98,7 @@ module Exceptionl
     end
 
     get '/search' do
-      erb :search
-    end
-    
-    post '/search' do
-      @results = store.search(params)
+      @results = store.search(params) if params["Search"]
       erb :search
     end
     
