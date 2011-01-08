@@ -64,6 +64,7 @@ table#exceptions, table#exceptions tr:first-child th:last-child {
 table#exceptions th {
   color: #eee;
   background-color: #333;
+  background: url('images/background.png');
   border-bottom: 1px solid #dadada;
   text-shadow:0 -1px 1px rgba(0,0,0,0.5);
 }

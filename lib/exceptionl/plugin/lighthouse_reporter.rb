@@ -1,4 +1,4 @@
-require 'lighthouse-api'
+require 'lighthouse'
 
 # A simple plugin for reporting exceptions as new bugs in Lighthouse.
 class Exceptionl::Plugin::LighthouseReporter < Exceptionl::Plugin::Base

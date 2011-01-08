@@ -10,12 +10,19 @@ GEM
       activesupport (= 3.0.3)
       builder (~> 2.1.2)
       i18n (~> 0.4)
+    activeresource (3.0.3)
+      activemodel (= 3.0.3)
+      activesupport (= 3.0.3)
     activesupport (3.0.3)
+    addressable (2.2.2)
     bson (1.1.5)
     builder (2.1.2)
     daemons (1.1.0)
     eventmachine (0.12.10)
     i18n (0.5.0)
+    lighthouse-api (2.0)
+      activeresource (>= 3.0.0)
+      activesupport (>= 3.0.0)
     mail (2.2.14)
       activesupport (>= 2.3.6)
       i18n (>= 0.4.0)
@@ -57,7 +64,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  addressable (~> 2.2.2)
   exceptionl!
+  lighthouse-api (= 2.0)
   mocha (~> 0.9.10)
   mongoid (~> 2.0.0.beta.20)
   pony (~> 1.1)
