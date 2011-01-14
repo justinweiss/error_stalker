@@ -21,7 +21,9 @@ class Exceptionl::Backends::Server < Exceptionl::Backends::Base
     req = Net::HTTP::Post.new("#{path}/report.json")
     req["content-type"] = "application/json"
     req.body = exception_report.to_json
-    res = Net::HTTP.start(host, port) { |http| http.request(req) }
+    http = Net::HTTP.new(host, port)
+    http.read_timeout = 10
+    res = http.start { |http| http.request(req) }
     res
   end
 end
