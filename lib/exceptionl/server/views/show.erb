@@ -22,7 +22,7 @@
 
 <% if @report.backtrace %>
 <h3>Stack trace</h3>
-<pre><code><%= h @report.backtrace %></code></pre>
+<pre><code><%= h @report.backtrace.join("\n") %></code></pre>
 <% end %>
 
 <% if @report.data && !@report.data.empty? %>

@@ -176,7 +176,7 @@ class Exceptionl::Store::Mongoid::ExceptionReport
   field :type
   field :exception
   field :data, :type => Array
-  field :backtrace
+  field :backtrace, :type => Array
   field :digest
 
   index :digest
@@ -216,7 +216,7 @@ class Exceptionl::Store::Mongoid::ExceptionReport
       end
       
       if exception_report.backtrace
-        o.backtrace = exception_report.backtrace.join("\n")
+        o.backtrace = exception_report.backtrace
       end
     end
     object.save
