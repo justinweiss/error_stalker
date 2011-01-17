@@ -5,7 +5,6 @@ require 'exceptionl'
 require 'exceptionl/store'
 require 'exceptionl/plugin'
 require 'erb'
-require 'pony'
 require 'will_paginate'
 require 'will_paginate/view_helpers/base'
 require 'will_paginate/view_helpers/link_renderer'
@@ -78,18 +77,6 @@ module Exceptionl
       self.class.configuration
     end
 
-    # Optionally send a mail if it's the first time we've seen this
-    # report
-    def send_email(exception_report)
-      if configuration['email']
-        @report = exception_report
-        Pony.mail(:to => configuration['email']['to'],
-          :from => configuration['email']['from'],
-          :subject => "Exception #{exception_report.machine} - #{exception_report.exception.to_s[0, 64]}",
-          :body => erb(:exception_email))
-      end
-    end
-
     def initialize
       super
       self.plugins = []
@@ -134,10 +121,7 @@ module Exceptionl
     post '/report.json' do
       report = Exceptionl::ExceptionReport.new(JSON.parse(request.body.read))
       report.id = store.store(report)
-
-      # Only send an email if it's the first exception of this type
-      # we've seen
-      send_email(report) if store.group(report.digest).count == 1
+      plugins.each {|p| p.after_create(self, report)}
       200
     end
     

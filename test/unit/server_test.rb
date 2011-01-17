@@ -62,12 +62,12 @@ class ServerTest < Test::Unit::TestCase
     assert_not_match /exceptions\/4.html/, last_response.body
   end
 
-  def test_emails_sent_only_on_first_report
-    app.any_instance.stubs(:configuration).returns('email' => {'to' => nil, 'from' => nil})
-    Pony.expects(:mail).once
+  def test_emails_sent_only_on_first_report_in_group
+    app.any_instance.stubs(:plugins).returns([Exceptionl::Plugin::EmailSender.new(nil, {'to' => nil, 'from' => nil})])
     report_exception('test', 2)
-    Pony.expects(:mail).once
-    report_exception('test')
+    assert_equal 1, Mail::TestMailer.deliveries.length
+    report_exception('test', 1)
+    assert_equal 2, Mail::TestMailer.deliveries.length
   end
   
   def report_exception(message = "failed", count = 1, data = {})

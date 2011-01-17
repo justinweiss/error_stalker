@@ -5,4 +5,8 @@ class Exceptionl::Plugin::Base
   def exception_links
     []
   end
+
+  # Called after a new exception is reported
+  def after_create(app, exception_report)
+  end
 end

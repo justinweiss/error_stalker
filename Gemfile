@@ -7,7 +7,6 @@ group :server do
   gem 'sinatra', '~>1.1.2'
   gem 'vegas', '~>0.1.8'
   gem 'thin', '~>1.2.7'
-  gem 'pony', '~>1.1'
 end
 
 group :mongoid_store do
@@ -22,4 +21,8 @@ end
 group :lighthouse_reporter do
   gem 'lighthouse-api', '2.0'
   gem 'addressable', '~>2.2.2'
+end
+
+group :email_sender do
+  gem 'mail', '~>2.2.14'
 end
