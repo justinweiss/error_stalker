@@ -5,6 +5,7 @@ class Exceptionl::Plugin::LighthouseReporter < Exceptionl::Plugin::Base
 
   attr_reader :project_id
   def initialize(app, params = {})
+    super(app, params)
     app.class.send(:include, Actions)
     app.lighthouse = self
     Lighthouse.account = params['account']
@@ -14,6 +15,7 @@ class Exceptionl::Plugin::LighthouseReporter < Exceptionl::Plugin::Base
   
   def exception_links(exception_report)
     [["Report to Lighthouse", "/lighthouse/report/#{exception_report.id}.html"]]
+    super(exception_report)
   end
 
   # Create a new lighthouse ticket object populated with information

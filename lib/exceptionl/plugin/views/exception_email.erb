@@ -4,12 +4,15 @@ Exception: <%= @report.application %> (<%= @report.machine %>) at <%= @report.ti
 
 Exception
 =========
+
 <%= @report.exception.to_s %>
 <% if @report.backtrace %>
 Stack Trace
 ===========
+
 <%= @report.backtrace.join("\n") %>
 <% end %>
 Extra Data
-====
+==========
+
 <%= @report.data.to_yaml %>

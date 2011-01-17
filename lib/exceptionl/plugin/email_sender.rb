@@ -5,6 +5,7 @@ class Exceptionl::Plugin::EmailSender < Exceptionl::Plugin::Base
   attr_reader :mail_params
   
   def initialize(app, params = {})
+    super(app, params)
     @mail_params = params
   end
 
@@ -15,7 +16,7 @@ class Exceptionl::Plugin::EmailSender < Exceptionl::Plugin::Base
     @url = exception_url
     
     mail = Mail.new({
-        'subject' => "Exception #{exception_report.machine} - #{exception_report.exception.to_s[0, 64]}",
+        'subject' => "Exception on #{exception_report.machine} - #{exception_report.exception.to_s[0, 64]}",
         'body' => ERB.new(File.read(File.expand_path('views/exception_email.erb', File.dirname(__FILE__)))).result(binding)
       }.merge(mail_params))
 
@@ -30,7 +31,9 @@ class Exceptionl::Plugin::EmailSender < Exceptionl::Plugin::Base
   # report
   def send_email(app, exception_report)
     request = app.request
-    url = "#{request.scheme}://#{request.host}:#{request.port}/exceptions/#{exception_report.id}.html"
+    host_with_port = request.host
+    host_with_port << ":#{request.port}" if request.port != 80
+    url = "#{request.scheme}://#{host_with_port}/exceptions/#{exception_report.id}.html"
     mail = build_email(exception_report, url)
     mail.deliver
   end
@@ -39,6 +42,7 @@ class Exceptionl::Plugin::EmailSender < Exceptionl::Plugin::Base
     # Only send an email if it's the first exception of this type
     # we've seen
     send_email(app, report) if app.store.group(report.digest).count == 1
+    super(app, report)
   end
 
 end
