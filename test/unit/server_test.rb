@@ -26,7 +26,7 @@ class ServerTest < Test::Unit::TestCase
   def test_can_see_homepage
     get '/'
     assert last_response.ok?
-    assert_not_match /table/, last_response.body
+    assert_no_match /table/, last_response.body
   end
 
   def test_can_see_homepage_table_after_exception_logged
@@ -59,7 +59,7 @@ class ServerTest < Test::Unit::TestCase
     get "/similar/#{e.digest}.html"
     assert last_response.ok?
     assert_match /exceptions\/0.html/, last_response.body
-    assert_not_match /exceptions\/4.html/, last_response.body
+    assert_no_match /exceptions\/4.html/, last_response.body
   end
 
   def test_emails_sent_only_on_first_report_in_group

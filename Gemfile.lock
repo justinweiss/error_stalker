@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    exceptionl (0.0.4)
+    exceptionl (0.0.6)
 
 GEM
   remote: http://rubygems.org/
@@ -20,6 +20,7 @@ GEM
     daemons (1.1.0)
     eventmachine (0.12.10)
     i18n (0.5.0)
+    json (1.4.6)
     lighthouse-api (2.0)
       activeresource (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -64,6 +65,7 @@ PLATFORMS
 DEPENDENCIES
   addressable (~> 2.2.2)
   exceptionl!
+  json (= 1.4.6)
   lighthouse-api (= 2.0)
   mail (~> 2.2.14)
   mocha (~> 0.9.10)

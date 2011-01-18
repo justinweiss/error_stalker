@@ -21,7 +21,7 @@ class Exceptionl::Plugin::EmailSender < Exceptionl::Plugin::Base
       }.merge(mail_params))
 
     if mail_params['delivery_method']
-      mail.delivery_method mail_params['delivery_method'].to_sym, mail_params['delivery_settings'] || {}
+      mail.delivery_method(mail_params['delivery_method'].to_sym, (mail_params['delivery_settings'] || {}))
     end
     
     mail

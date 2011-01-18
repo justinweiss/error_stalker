@@ -26,3 +26,5 @@ end
 group :email_sender do
   gem 'mail', '~>2.2.14'
 end
+
+gem 'json', '1.4.6', :platforms => :ruby_18
