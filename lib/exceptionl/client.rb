@@ -17,6 +17,18 @@ class Exceptionl::Client
   end
 
   # Report an exception to the exception logging backend.
+  #
+  # * application_name: A tag representing the name of the app that
+  #   this exception occurred in. This is used for advanced filtering
+  #   on the server, if the server backend is used.
+  #
+  # * exception: The exception object that was thrown. This can also
+  #   be a string, but you won't get information like the backtrace if
+  #   you don't pass an actual exception subclass.
+  #
+  # * extra_data: A hash of additional data to log with the
+  #   exception. Depending on which backend the server uses, this may
+  #   or may not be indexable.
   def self.report(application_name, exception, extra_data = {})
     begin
       @backend.report(Exceptionl::ExceptionReport.new(:application => application_name, :exception => exception, :data => extra_data))
@@ -24,7 +36,7 @@ class Exceptionl::Client
     end
   end
 
-  # Report all exceptions that occur while running the passed-in block.
+  # Calls #report on all exceptions raised in a block of code.
   def self.report_exceptions(application_name)
     begin
       yield
