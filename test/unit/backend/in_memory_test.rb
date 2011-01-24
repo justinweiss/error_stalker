@@ -1,11 +1,11 @@
 require 'test_helper'
-require 'exceptionl/backends/in_memory'
+require 'exceptionl/backend/in_memory'
 
-class BackendsInMemoryTest < Test::Unit::TestCase
+class BackendInMemoryTest < Test::Unit::TestCase
 
   def setup
     super
-    @backend = Exceptionl::Backends::InMemory.new
+    @backend = Exceptionl::Backend::InMemory.new
     @exception_report = Exceptionl::ExceptionReport.new(:application => :unit_test, :exception => 'Test Exception')
   end
   

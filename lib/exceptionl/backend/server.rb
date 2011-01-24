@@ -2,7 +2,7 @@ require 'json'
 require 'net/http'
 
 # Provides a backend that logs all exception data to a file.
-class Exceptionl::Backends::Server < Exceptionl::Backends::Base
+class Exceptionl::Backend::Server < Exceptionl::Backend::Base
 
   attr_accessor :host, :port, :protocol, :path 
   

@@ -1,4 +1,4 @@
-module Exceptionl::Backends
+module Exceptionl::Backend
 
   # Base class for exception logger backends. All backends should
   # inherit from this class and implement the +report+ method.

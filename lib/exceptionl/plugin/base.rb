@@ -7,8 +7,9 @@ class Exceptionl::Plugin::Base
   def initialize(app, params = {})
   end
   
-  # An array of [name, href] pairs of links that should show up on the
-  # exceptions/show page.
+  # An array of [name, href] pairs of links that will show up on the
+  # exception detail page. These are most commonly used to link to
+  # additional routes added by the plugin.
   def exception_links(exception_report)
     []
   end

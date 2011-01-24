@@ -1,11 +1,11 @@
 require 'test_helper'
-require 'exceptionl/backends/in_memory'
+require 'exceptionl/backend/in_memory'
 
 class ClientTest < Test::Unit::TestCase
 
   def setup
     super
-    @backend = Exceptionl::Backends::InMemory.new
+    @backend = Exceptionl::Backend::InMemory.new
     Exceptionl::Client.backend = @backend
   end
   

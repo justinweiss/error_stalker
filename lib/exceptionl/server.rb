@@ -7,31 +7,20 @@ require 'exceptionl/plugin'
 require 'erb'
 require 'will_paginate'
 require 'will_paginate/view_helpers/base'
-require 'will_paginate/view_helpers/link_renderer'
-
-WillPaginate::ViewHelpers::LinkRenderer.class_eval do
-  protected
-  def url(page)
-    url = @template.request.url
-    params = @template.request.params.dup
-    if page == 1
-      params.delete("page")
-    else
-      params["page"] = page
-    end
-
-    @template.request.path + "?" + params.map {|k, v| "#{Rack::Utils.escape(k)}=#{Rack::Utils.escape(v)}"}.join("&")
-  end
-end
+require 'exceptionl/sinatra_link_renderer'
 
 module Exceptionl
-  PER_PAGE = 25
-  
   # The exceptionl server. Provides a UI for browsing, grouping,
   # and searching exception reports.
   class Server < Sinatra::Base
-    attr_accessor :store
-    attr_accessor :plugins
+
+    # The number of exceptions or exception groups to show on each
+    # page.
+    PER_PAGE = 25
+  
+    attr_accessor :store # The data store (Exceptionl::Store instance)
+                         # to use to store exception data
+    attr_accessor :plugins # A list of plugins the server will use.
     
     set :root, File.dirname(__FILE__)
     set :public, Proc.new { File.join(root, "server/public") }
@@ -60,10 +49,17 @@ module Exceptionl
     end
 
     class << self
-      attr_accessor :configuration
+      attr_accessor :configuration # A hash of configuration options,
+                                   # usually read from a configuration
+                                   # file.
     end
     self.configuration = {}
 
+    # The default Exceptionl::Store subclass to use by default for
+    # this Exceptionl::Server instance. This is defined as a class
+    # method as well as an instance method so that it can be set by a
+    # configuration file before rack creates the instance of this
+    # sinatra app.
     def self.store
       if configuration['store']
         store_class = configuration['store']['class'].split('::').inject(Object) {|mod, string| mod.const_get(string)}
@@ -72,11 +68,15 @@ module Exceptionl
         Exceptionl::Store::InMemory.new
       end
     end
-    
+
+    # A hash of configuration options, usually read from a
+    # configuration file.
     def configuration
       self.class.configuration
     end
 
+    # Creates a new instance of the server, based on the configuration
+    # contained in the +configuration+ attribute.
     def initialize
       super
       self.plugins = []

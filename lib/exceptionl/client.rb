@@ -2,13 +2,16 @@ require 'exceptionl/exception_report'
 require 'exceptionl/backends'
 require 'tempfile'
 
-# This class implements the client-side exception logging
-# functionality. By default, it logs exceptions to a log file, though
-# this can be overridden.
+# The exceptionl client enables you to log exception data to a
+# backend. The class method Exceptionl::Client.report is usually the
+# method you want to use out of this class, although for those who
+# like block syntax, this class also provides a +report_exceptions+
+# method that reports all exceptions raised inside a block.
 class Exceptionl::Client
 
   # Sets the backend the client will use to report exceptions to
-  # +new_backend+
+  # +new_backend+, an Exceptionl::Backend instance. By default,
+  # exceptions are logged using Exceptionl::Backend::LogFileBackend.
   def self.backend=(new_backend)
     @backend = new_backend
   end
@@ -36,4 +39,4 @@ logfile = File.join(Dir.tmpdir, "exceptions.log")
 # let's put this in a better place if we're using rails
 logfile = Rails.root + 'log/exceptions.log' if defined?(Rails)
 
-Exceptionl::Client.backend = Exceptionl::Backends::LogFile.new(logfile)
+Exceptionl::Client.backend = Exceptionl::Backend::LogFile.new(logfile)
