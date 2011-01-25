@@ -1,8 +1,11 @@
 require 'yaml'
 
-# Provides a backend that logs all exception data to a file.
+# A backend that logs all exception reports to a file. This is
+# probably what you want to be running in development mode, and is
+# also the default backend.
 class Exceptionl::Backend::LogFile < Exceptionl::Backend::Base
 
+  # The name of the file containing the exception reports
   attr_reader :filename
 
   # Creates a new LogFile backend that will log exceptions to +filename+

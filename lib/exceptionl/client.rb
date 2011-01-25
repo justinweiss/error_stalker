@@ -36,7 +36,8 @@ class Exceptionl::Client
     end
   end
 
-  # Calls #report on all exceptions raised in a block of code.
+  # Calls +report+ on all exceptions raised in the provided block of
+  # code.
   def self.report_exceptions(application_name)
     begin
       yield

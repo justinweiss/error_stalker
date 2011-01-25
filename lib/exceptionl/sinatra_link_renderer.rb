@@ -6,6 +6,8 @@ module Exceptionl
   # sinatra-style request hashes.
   class SinatraLinkRenderer < WillPaginate::ViewHelpers::LinkRenderer
     protected
+
+    # Returns the URL for the given +page+
     def url(page)
       url = @template.request.url
       params = @template.request.params.dup

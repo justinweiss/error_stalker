@@ -10,17 +10,23 @@ require 'will_paginate/view_helpers/base'
 require 'exceptionl/sinatra_link_renderer'
 
 module Exceptionl
-  # The exceptionl server. Provides a UI for browsing, grouping,
-  # and searching exception reports.
+  # The Exceptionl server. Provides a UI for browsing, grouping, and
+  # searching exception reports, as well as a centralized store for
+  # keeping exception reports. As a Sinatra app, this can be run using
+  # a config.ru file or something like Vegas. A sample Vegas runner
+  # for the server is located in <tt>bin/exceptionl_server</tt>.
   class Server < Sinatra::Base
 
     # The number of exceptions or exception groups to show on each
     # page.
     PER_PAGE = 25
-  
-    attr_accessor :store # The data store (Exceptionl::Store instance)
-                         # to use to store exception data
-    attr_accessor :plugins # A list of plugins the server will use.
+
+    # The data store (Exceptionl::Store instance) to use to store
+    # exception data
+    attr_accessor :store 
+    
+    # A list of plugins the server will use.
+    attr_accessor :plugins
     
     set :root, File.dirname(__FILE__)
     set :public, Proc.new { File.join(root, "server/public") }
@@ -31,7 +37,9 @@ module Exceptionl
       alias_method :h, :escape_html
 
       include WillPaginate::ViewHelpers::Base
-      
+
+      # Generates a url from an array of strings representing the
+      # parts of the path.
       def url(*path_parts)
         u = '/' + path_parts.join("/")
         u += '.html' unless u =~ /\.\w{2,4}$/
@@ -39,6 +47,8 @@ module Exceptionl
       end
       alias_method :u, :url
 
+      # Cuts +str+ at +limit+ characters. If +str+ is too long, will
+      # apped '...' to the end of the returned string.
       def cutoff(str, limit = 100)
         if str.length > limit
           str[0, limit] + '...'
@@ -49,9 +59,9 @@ module Exceptionl
     end
 
     class << self
-      attr_accessor :configuration # A hash of configuration options,
-                                   # usually read from a configuration
-                                   # file.
+      # A hash of configuration options, usually read from a
+      # configuration file.
+      attr_accessor :configuration 
     end
     self.configuration = {}
 

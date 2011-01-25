@@ -2,11 +2,18 @@ require 'mongoid'
 require 'exceptionl/store/base'
 
 # Store exceptions using MongoDB. This store provides fast storage and
-# querying of exceptions, and long-term persistence.
+# querying of exceptions, and long-term persistence. It also allows
+# querying based on arbitrary data stored in the +data+ hash of the
+# exception report, which allows for crazy things like searching
+# reports by URL or IP address. 
 class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
   
   # Configure mongoid from the mongoid config file found in
-  # +config_file+.
+  # +config_file+. This mongoid config file should be similar to the
+  # one on http://mongoid.org/docs/installation/, and must be indexed
+  # by environment name. +config_file+ is relative to either wherever
+  # you start the server from or the config.ru file, unless you pass a
+  # full file path.
   def initialize(config_file)
     filename = File.expand_path(config_file)
     settings = YAML.load(ERB.new(File.new(filename).read).result)
@@ -16,7 +23,7 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
     end
   end
 
-  # Store +exception_report+ in the exception list
+  # Store +exception_report+ in the database.
   def store(exception_report)
     report = ExceptionReport.create_from_exception_report(exception_report)
 
@@ -28,6 +35,7 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
       },
       :upsert => true)
 
+    # Update indexes to pre-populate the search dropdowns.
     Machine.collection.update(
       {:name => report.machine},
       {:name => report.machine},
@@ -46,8 +54,16 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
     ExceptionGroup.where(:timestamp.gt => 7.days.ago).count == 0
   end
 
-  # Return the last 7 days worth of unique exception reports grouped by exception group.
+  # Return the last 7 days worth of unique exception reports grouped
+  # by exception group.
   def recent
+    # Needs to be wrapped in a PaginationHelper because we'll call
+    # paginate on the collection returned from this method. We don't
+    # want to use mongoid pagination here because we don't know what
+    # parameters we want to paginate on, and we don't want to return
+    # an array here because we don't want to load all the mongid
+    # models in memory. This is also made trickier because of my
+    # hacked-up :include stuff I built into ExceptionGroup.
     ExceptionGroup::PaginationHelper.new(ExceptionGroup.where(:timestamp.gt => 7.days.ago).order_by(:timestamp.desc))
   end
 
@@ -68,11 +84,14 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
 
   # returns the group this exception is a part of, ordered by
   # timestamp
-  def group(digest, params = {})
+  def group(digest)
     ExceptionReport.where(:digest => digest).order_by(:timestamp.desc)
   end
 
-  # Searches for exception reports maching +params+.
+  # Searches for exception reports maching +params+. Supports querying
+  # by arbitrary data in the +data+ hash associated with the exception, with the format:
+  #
+  # REMOTE_ADDR:127.0.0.1 PATH:/test
   def search(params)
     scope = ExceptionReport.all
 
@@ -98,31 +117,34 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
     scope.order_by(:timestamp.desc)
   end
 
-  # Creates the MongoDB indexes used by this driver.
+  # Creates the MongoDB indexes used by this driver. Should be called
+  # at some point after deciding to use the mongoid store. Can be
+  # called either manually, or by running <tt>bin/create_indexes</tt>
   def create_indexes
     Exceptionl::Store::Mongoid::ExceptionReport.create_indexes
     Exceptionl::Store::Mongoid::ExceptionGroup.create_indexes
   end
 end
 
-# A cache of all the applications that have been seen by this server,
-# so we don't have to search the entire DB to populate the search
-# dropdown.
+# A cache of all the applications that have had exception reports seen
+# by this server, so we don't have to search the entire DB to populate
+# the search dropdown.
 class Exceptionl::Store::Mongoid::Application
   include Mongoid::Document
   field :name
 end
 
-# A cache of all the machines that have been seen by this server,
-# so we don't have to search the entire DB to populate the search
-# dropdown.
+# A cache of all the machines that have had exception reports seen by
+# this server, so we don't have to search the entire DB to populate
+# the search dropdown.
 class Exceptionl::Store::Mongoid::Machine
   include Mongoid::Document
   field :name
 end
 
 # Aggregates exceptions for for the 'recent exceptions' list. This is
-# way faster than mapreducing on demand.
+# way faster than mapreducing on demand, although it requires some
+# crazy code to preload all the exceptions.
 class Exceptionl::Store::Mongoid::ExceptionGroup < Exceptionl::ExceptionGroup
   include Mongoid::Document
   field :count, :type => Integer
@@ -137,15 +159,19 @@ class Exceptionl::Store::Mongoid::ExceptionGroup < Exceptionl::ExceptionGroup
 
   # When we display the list of grouped recent exceptions, we paginate
   # them. We also need to display information about the most recent
-  # exception report. This helper class wraps +paginate+, including
-  # the most recent reports for the requested exception groups.
+  # exception report. This helper class wraps +paginate+, doing a
+  # hacked-in +:include+ to get the most recent reports for the requested
+  # exception groups without running into the N+1 problem.
   class PaginationHelper
 
+    # Wraps +criteria+ in a new PaginationHelper, which will include
+    # the most recent exception reports when +paginate+ is called.
     def initialize(criteria)
       @criteria = criteria
     end
 
-    # Override pagination to support preloading the exception reports
+    # Override the built-in pagination to support preloading the
+    # associated exception reports.
     def paginate(pagination_opts = {})
       recent = @criteria.paginate(pagination_opts)
       exceptions = Exceptionl::Store::Mongoid::ExceptionReport.where(:_id.in => recent.map(&:most_recent_report_id))
@@ -185,7 +211,9 @@ class Exceptionl::Store::Mongoid::ExceptionReport
 
   # Generates an Exceptionl::ExceptionReport from this model,
   # converting the +data+ field from a list of key-value pairs to a
-  # full-fledged hash.
+  # full-fledged hash. Internally, we store it as a list of key->value
+  # to support fast multiattribute indexing, one of the cooler mongo
+  # features.
   def to_exception_report
     params = {}
     [:id, :application, :machine, :timestamp, :type, :exception, :digest, :backtrace].each do |field|

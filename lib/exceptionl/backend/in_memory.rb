@@ -1,9 +1,13 @@
 # Provides an in-memory backend that stores all exception reports in
-# an array.
+# an array. This is mostly useful for tests, and probably shouldn't be
+# used in real code.
 class Exceptionl::Backend::InMemory < Exceptionl::Backend::Base
 
+  # A list of exceptions stored in this backend.
   attr_reader :exceptions
 
+  # Create a new instance of this backend, with an empty exception
+  # list.
   def initialize
     clear
   end
@@ -13,7 +17,7 @@ class Exceptionl::Backend::InMemory < Exceptionl::Backend::Base
     @exceptions << exception_report
   end
 
-  # Clears +exceptions+
+  # Clears the exception list. Pretty useful in a test +setup+ method!
   def clear
     @exceptions = []
   end

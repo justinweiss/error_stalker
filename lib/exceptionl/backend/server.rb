@@ -1,13 +1,26 @@
 require 'json'
 require 'net/http'
 
-# Provides a backend that logs all exception data to a file.
+# Stores reported exceptions to a central Exceptionl server (a Rack
+# server pointing to an Exceptionl::Server instance). The most
+# complicated Exceptionl backend, it is also the most powerful. This
+# is probably what you want to be using in production.
 class Exceptionl::Backend::Server < Exceptionl::Backend::Base
 
-  attr_accessor :host, :port, :protocol, :path 
+  # The hostname of the Exceptionl server
+  attr_accessor :host
+
+  # The Exceptionl server's port
+  attr_accessor :port
+
+  # http or https
+  attr_accessor :protocol
+
+  # The path of the Exceptionl server, if applicable
+  attr_accessor :path 
   
-  # Creates a new Server backend that will log exceptions to a
-  # centralized server
+  # Creates a new Server backend instance that will report exceptions
+  # to a centralized Exceptionl server.
   def initialize(params = {})
     @protocol = params[:protocol] || 'http://'
     @host = params[:host] || 'localhost'
@@ -15,8 +28,7 @@ class Exceptionl::Backend::Server < Exceptionl::Backend::Base
     @path = params[:path] || ''
   end
 
-  # Reports +exception_report+ to a centralized
-  # Exceptionl::Server.
+  # Reports +exception_report+ to a central Exceptionl server.
   def report(exception_report)
     req = Net::HTTP::Post.new("#{path}/report.json")
     req["content-type"] = "application/json"

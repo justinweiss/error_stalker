@@ -1,11 +1,36 @@
 require 'json'
 require 'digest/md5'
 
-# An ExceptionReport contains the exception data, which can then be
-# transformed into whatever format is needed for further
-# investigation.
+# An ExceptionReport contains all of the information we have on an
+# exception, which can then be transformed into whatever format is
+# needed for further investigation. Some data stores may override this
+# class, but they should be able to be treated as instances of this
+# class regardless.
 class Exceptionl::ExceptionReport
-  attr_reader :application, :machine, :timestamp, :type, :exception, :data, :backtrace
+  
+  # The name of the application that caused this exception. 
+  attr_reader :application
+
+  # The name of the machine that raised this exception.
+  attr_reader :machine
+
+  # The time that this exception occurred
+  attr_reader :timestamp
+
+  # The class name of +exception+
+  attr_reader :type
+
+  # The exception object (or string message) this report represents
+  attr_reader :exception
+
+  # A hash of extra data logged along with this exception.
+  attr_reader :data
+
+  # The backtrace corresponding to this exception. Should be an array
+  # of strings, each referring to a single stack frame.
+  attr_reader :backtrace
+
+  # A unique identifier for this exception
   attr_accessor :id
 
   # Build a new ExceptionReport. <tt>params[:application]</tt> is a
@@ -39,6 +64,10 @@ class Exceptionl::ExceptionReport
     @digest = params[:digest] if params[:digest]
   end
 
+  # The number of characters in this exception's stacktrace that
+  # should be used to uniquify this exception. Exceptions raised from
+  # the same place should have the same stacktrace, up to
+  # +STACK_DIGEST_LENGTH+ characters.
   STACK_DIGEST_LENGTH = 4096
 
   # Generate a 'mostly-unique' hash code for this exception, that
@@ -49,7 +78,7 @@ class Exceptionl::ExceptionReport
     @digest ||= Digest::MD5.hexdigest((backtrace ? backtrace.to_s[0,STACK_DIGEST_LENGTH] : exception.to_s) + type.to_s)
   end
 
-  # Serialize this object to json, so we can send it over the wire
+  # Serialize this object to json, so we can send it over the wire.
   def to_json
     {
       :application => application,
@@ -64,14 +93,17 @@ class Exceptionl::ExceptionReport
 
   private
 
-  # shamelessly stolen from rails
+  # Shamelessly stolen from rails. Converts the keys in +hash+ from
+  # strings to symbols.
   def symbolize_keys(hash)
     hash.inject({}) do |options, (key, value)|
       options[(key.to_sym rescue key) || key] = value
       options
     end
   end
-  
+
+  # Determine the name of this machine. Should work on Windows, Linux,
+  # and Mac OS X, but only tested on Debian, Ubuntu, and Mac OS X.
   def machine_name
     machine_name = 'unknown'
     if RUBY_PLATFORM =~ /win32/
