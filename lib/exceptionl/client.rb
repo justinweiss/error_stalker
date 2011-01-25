@@ -1,5 +1,5 @@
 require 'exceptionl/exception_report'
-require 'exceptionl/backends'
+require 'exceptionl/backend'
 require 'tempfile'
 
 # The exceptionl client enables you to log exception data to a

@@ -1,7 +1,6 @@
 require 'exceptionl/exception_group'
 
 module Exceptionl::Store
-
   # The base store that all other exception stores should inherit
   # from. All methods on this class must be inherited by subclasses,
   # and the methods that return multiple objects must support
@@ -41,4 +40,5 @@ module Exceptionl::Store
     # should be ordered by timestamp from newest to oldest.
     def search(params)
     end
+  end
 end
