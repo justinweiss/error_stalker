@@ -22,11 +22,29 @@ class ClientTest < Test::Unit::TestCase
   end
 
   def test_report_exceptions_in_block
-    Exceptionl::Client.report_exceptions(:unit_test) do
-      raise new_exception
-    end
+    assert_raises NoMethodError do 
+      Exceptionl::Client.report_exceptions(:unit_test) do
+        raise new_exception
+      end
 
-    assert_equal 1, @backend.exceptions.length
+      assert_equal 1, @backend.exceptions.length
+    end
+  end
+
+  def test_report_exceptions_in_block_without_reraise
+    assert_nothing_raised do
+      Exceptionl::Client.report_exceptions(:unit_test, :reraise => false) do
+        raise new_exception
+      end
+
+      assert_equal 1, @backend.exceptions.length
+
+      Exceptionl::Client.report_exceptions(:unit_test, :reraise => nil) do
+        raise new_exception
+      end
+
+      assert_equal 2, @backend.exceptions.length
+    end
   end
 
   def test_dont_raise_exceptions_during_report

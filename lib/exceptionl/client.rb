@@ -37,12 +37,19 @@ class Exceptionl::Client
   end
 
   # Calls +report+ on all exceptions raised in the provided block of
-  # code.
-  def self.report_exceptions(application_name)
+  # code. +options+ can be:
+  #
+  # [:reraise] if true, reraise exceptions caught in this
+  #            block. Defaults to true.
+  def self.report_exceptions(application_name, options = {})
+    options = {:reraise => true}.merge(options)
     begin
       yield
     rescue => e
       report(application_name, e)
+      if options[:reraise]
+        raise e
+      end
     end
   end
 end
