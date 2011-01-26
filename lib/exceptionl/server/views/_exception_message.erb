@@ -1,13 +1,5 @@
 <% if @exception.type == "ActionView::TemplateError" %>
-  <span id="cutoff_exception_<%= @exception.id %>">
-    <%= h @exception.exception.to_s.split(/on line #/).first %>
-    <a href="#" onclick="$('#cutoff_exception_<%= @exception.id %>').hide();$('#full_exception_<%= @exception.id %>').show();return false;">(more)</a>
-  </span>
-
-  <span id="full_exception_<%= @exception.id %>" style="display:none">
-    <%= h @exception.exception.to_s %> <a href="#" onclick="$('#full_exception_<%= @exception.id %>').hide();$('#cutoff_exception_<%= @exception.id %>').show();return false;">(less)</a>
-  </span>
-  
+  <%= h @exception.exception.to_s.split(/on line #/).first %>
 <% else %>
   <%= h @exception.exception.to_s %>
 <% end %>
