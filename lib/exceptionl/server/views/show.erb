@@ -17,8 +17,8 @@
   <% end %>
 <% end %>
 
-
-<h2><%= h @report.exception %></h2>
+<% @exception = @report %>
+<h2><%= erb :_exception_message %></h2>
 
 <% if @report.backtrace %>
 <h3>Stack trace</h3>

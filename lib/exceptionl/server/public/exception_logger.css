@@ -112,7 +112,7 @@ table#exceptions .details {
 pre {
   overflow: auto;
   padding: 8px;
-  background-color: #ccc;
+  background-color: #d6d6d6;
   margin: 0px;
   border: 1px solid #aaa;
 }
@@ -161,4 +161,13 @@ form input[type=submit] {
   clear: left;
   width: auto;
   margin: 8px 0px 0px 0px;
+}
+
+.pagination {
+  padding: 16px 0px;
+}
+
+.pagination em {
+  font-weight: bold;
+  font-style: normal;
 }

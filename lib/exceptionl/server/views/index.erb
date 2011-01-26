@@ -5,7 +5,7 @@
 <% else %>
   <p><a href="/search">Search</a></p>
 
-  <p class="pagination"><%= will_paginate @records %></p>
+  <%= will_paginate @records %>
   <table id="exceptions" cellpadding="0">
     <tr>
       <th class="count">Count</th>
@@ -21,10 +21,11 @@
           <%= h group.most_recent_report.application %><br />
           <%= h group.most_recent_report.machine %><br />
         </td>
-        <td class="exception"><div><%= h group.most_recent_report.exception %></td>
+        <% @exception = group.most_recent_report %>
+        <td class="exception"><div><%= erb :_exception_message %></div></td>
         <td class="links"><a href="/exceptions/<%= group.most_recent_report.id %>.html">View</a> | <a href="/similar/<%= group.digest %>.html">See all</a></td>
       </tr>
     <% end %>
   </table>
-  <p class="pagination"><%= will_paginate @records %></p>
+  <%= will_paginate @records %>
 <% end %>

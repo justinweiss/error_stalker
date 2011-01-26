@@ -2,37 +2,5 @@
 <h2>Exceptions similar to:</h2>
 <h1><%= h cutoff(@group.first.exception) %></h1>
 
-<p class="pagination"><%= will_paginate @group %></p>
-<table id="exceptions" cellpadding="0">
-  <tr>
-    <th class="count">&nbsp;</th>
-    <th class="last_occurred">Occurred</th>
-    <th class="exception">Exception</th>
-    <th class="links">&nbsp;</th>
-  </tr>
-  <% @group.each_with_index do |report, i| %>
-    <tr id="<%= report.id %>" class="<%= i.even? ? 'even' : 'odd' %>">
-      <td class="count">&nbsp;</td>
-      <td class="last_occurred">
-        <span class="timestamp"><%= h report.timestamp %></span><br />
-        <%= h report.application %><br />
-        <%= h report.machine %><br />
-      </td>
-      <td class="exception">
-        <div>
-          <%= h report.exception %>
-          <% if report.backtrace %>
-            <br />
-            <a href="javascript:$('tr#<%= report.id%> .stacktrace').toggle();">Stack trace</a>
-            <div class="stacktrace" style="display:none">
-              <pre><code><%= h report.backtrace.join("\n") %></code></pre>
-            </div>
-          <% end %>
-        </div>
-      </td>
-      <td class="links"><a href="/exceptions/<%= report.id %>.html">View</a></td>
-    </tr>
-  <% end %>
-</table>
-<p class="pagination"><%= will_paginate @group %></p>
-
+<% @rows = @group%>
+<%= erb :_exception_table %>

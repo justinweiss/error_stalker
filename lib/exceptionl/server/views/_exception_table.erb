@@ -1,0 +1,34 @@
+<%= will_paginate @rows, :params => params %>
+<table id="exceptions" cellpadding="0">
+  <tr>
+    <th class="count">&nbsp;</th>
+    <th class="last_occurred">Occurred</th>
+    <th class="exception">Exception</th>
+    <th class="links">&nbsp;</th>
+  </tr>
+  <% @rows.each_with_index do |report, i| %>
+    <tr id="<%= report.id %>" class="<%= i.even? ? 'even' : 'odd' %>">
+      <td class="count">&nbsp;</td>
+      <td class="last_occurred">
+        <span class="timestamp"><%= h report.timestamp %></span><br />
+        <%= h report.application %><br />
+        <%= h report.machine %><br />
+      </td>
+      <td class="exception">
+        <div>
+          <% @exception = report %>
+          <%= erb :_exception_message %>
+          <% if report.backtrace %>
+            <br />
+            <a href="javascript:$('tr#<%= report.id%> .stacktrace').toggle();">Stack trace</a>
+            <div class="stacktrace" style="display:none">
+              <pre><code><%= h report.backtrace.join("\n") %></code></pre>
+            </div>
+          <% end %>
+        </div>
+      </td>
+      <td class="links"><a href="/exceptions/<%= report.id %>.html">View</a></td>
+    </tr>
+  <% end %>
+</table>
+<%= will_paginate @rows %>
