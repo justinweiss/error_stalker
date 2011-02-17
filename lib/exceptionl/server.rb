@@ -110,7 +110,7 @@ module Exceptionl
     end
     
     get '/similar/:digest.html' do
-      @group = store.group(params[:digest]).paginate(:page => params[:page], :per_page => PER_PAGE)
+      @group = store.reports_in_group(params[:digest]).paginate(:page => params[:page], :per_page => PER_PAGE)
       if @group
         erb :similar
       else

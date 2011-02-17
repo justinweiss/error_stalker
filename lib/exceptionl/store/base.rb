@@ -28,8 +28,13 @@ module Exceptionl::Store
       raise NotImplementedError, "Must be implemented by child class"
     end
 
-    # Returns a list of exceptions whose digest is +digest+.
+    # Returns the ExceptionGroup matching +digest+
     def group(digest)
+      raise NotImplementedError, "Must be implemented by child class"
+    end
+    
+    # Returns a list of exceptions whose digest is +digest+.
+    def reports_in_group(digest)
       raise NotImplementedError, "Must be implemented by child class"
     end
     

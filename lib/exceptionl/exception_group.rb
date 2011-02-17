@@ -10,8 +10,14 @@ class Exceptionl::ExceptionGroup
   # generate the same digest.
   attr_accessor :digest
 
+  # The list of machines that have seen this exception
+  attr_accessor :machines
+
+  # The first time this exception occurred
+  attr_accessor :first_timestamp
+  
   # The most recent time this exception occurred
-  attr_accessor :timestamp
+  attr_accessor :most_recent_timestamp
 
   # The most recent ExceptionReport instance belonging to this group
   attr_accessor :most_recent_report

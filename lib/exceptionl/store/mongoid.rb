@@ -21,37 +21,19 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
     Mongoid.configure do |config|
       config.from_hash(settings[ENV['RACK_ENV']])
     end
+    Thread.new { migrate_data }
   end
 
   # Store +exception_report+ in the database.
   def store(exception_report)
     report = ExceptionReport.create_from_exception_report(exception_report)
-
-    ExceptionGroup.collection.update(
-      {:digest => report.digest},
-      {
-        '$inc' => {:count => 1},
-        '$set' => {:most_recent_report_id => report.id, :timestamp => report.timestamp},
-      },
-      :upsert => true)
-
-    # Update indexes to pre-populate the search dropdowns.
-    Machine.collection.update(
-      {:name => report.machine},
-      {:name => report.machine},
-      :upsert => true)
-    
-    Application.collection.update(
-      {:name => report.application},
-      {:name => report.application},
-      :upsert => true)
-
+    update_caches(report)
     report.id
   end
 
   # Have we logged any exceptions?
   def empty?
-    ExceptionGroup.where(:timestamp.gt => 7.days.ago).count == 0
+    ExceptionGroup.where(:most_recent_timestamp.gt => 7.days.ago).count == 0
   end
 
   # Return the last 7 days worth of unique exception reports grouped
@@ -64,7 +46,7 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
     # an array here because we don't want to load all the mongid
     # models in memory. This is also made trickier because of my
     # hacked-up :include stuff I built into ExceptionGroup.
-    ExceptionGroup::PaginationHelper.new(ExceptionGroup.where(:timestamp.gt => 7.days.ago).order_by(:timestamp.desc))
+    ExceptionGroup::PaginationHelper.new(ExceptionGroup.where(:most_recent_timestamp.gt => 7.days.ago).order_by(:most_recent_timestamp.desc))
   end
 
   # Find an exception report with the given id.
@@ -74,18 +56,24 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
 
   # All applications that have been seen by this store
   def applications
-    Application.all.order_by(:name).map(&:name)
+    Application.all.order_by(:name.asc).map(&:name)
   end
 
   # All machines that have been seen by this store
   def machines
-    Machine.all.order_by(:name).map(&:name)
+    Machine.all.order_by(:name.asc).map(&:name)
   end
 
-  # returns the group this exception is a part of, ordered by
-  # timestamp
-  def group(digest)
+  # Returns all the exceptions in a group, ordered by
+  # most_recent_timestamp
+  def reports_in_group(digest)
     ExceptionReport.where(:digest => digest).order_by(:timestamp.desc)
+  end
+  
+  # returns the ExceptionGroup object corresponding to a particular
+  # digest
+  def group(digest)
+    ExceptionGroup.where(:digest => digest).first
   end
 
   # Searches for exception reports maching +params+. Supports querying
@@ -114,7 +102,7 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
       end
     end
     
-    scope.order_by(:timestamp.desc)
+    scope.order_by(:most_recent_timestamp.desc)
   end
 
   # Creates the MongoDB indexes used by this driver. Should be called
@@ -124,6 +112,68 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
     Exceptionl::Store::Mongoid::ExceptionReport.create_indexes
     Exceptionl::Store::Mongoid::ExceptionGroup.create_indexes
   end
+
+  # Migrate the data in the mongoid database to a newer format. This
+  # should eventually be more robust, like the Rails version, but for
+  # now this should be fine.
+  def migrate_data
+    if SchemaMigrations.where(:version => 1).empty?
+      ExceptionGroup.all.order_by(:timestamp).desc.each do |group|
+        exceptions = ExceptionReport.where(:digest => group.digest).order_by(:timestamp)
+        unless exceptions.empty?
+          exceptions = exceptions.to_a
+          group.attributes[:timestamp] = nil
+          group.first_timestamp = exceptions[0].timestamp
+          group.most_recent_timestamp = exceptions[-1].timestamp
+          group.machines = exceptions.map(&:machine).uniq
+          group.save
+        end
+      end
+      SchemaMigrations.create(:version => 1)
+    end
+  end
+
+  protected
+
+  # In order to make Exceptionl super-fast, we keep a bunch of cached
+  # data (like exception report groups, machines, and
+  # applications). +update_caches+ updates all of this cached data
+  # when an exception report comes in.
+  def update_caches(report)
+    ExceptionGroup.collection.update(
+      {:digest => report.digest},
+      {
+        '$inc' => {:count => 1},
+        '$set' => {:most_recent_report_id => report.id, :most_recent_timestamp => report.timestamp},
+        '$addToSet' => {:machines => report.machine}
+      },
+      :upsert => true)
+    
+    # Make sure the first_timestamp parameter is set. Unfortunately
+    # mongoid doesn't have an $add modifier yet, so we have to do another query.
+    ExceptionGroup.collection.update(
+      {:digest => report.digest, :first_timestamp => nil},
+      {:first_timestamp => report.timestamp})
+
+    # Update indexes to pre-populate the search dropdowns.
+    Machine.collection.update(
+      {:name => report.machine},
+      {:name => report.machine},
+      :upsert => true)
+    
+    Application.collection.update(
+      {:name => report.application},
+      {:name => report.application},
+      :upsert => true)
+
+    report.id
+  end
+end
+
+# Keeps track of the migrations we've run so far.
+class Exceptionl::Store::Mongoid::SchemaMigrations
+  include Mongoid::Document
+  field :version
 end
 
 # A cache of all the applications that have had exception reports seen
@@ -149,10 +199,12 @@ class Exceptionl::Store::Mongoid::ExceptionGroup < Exceptionl::ExceptionGroup
   include Mongoid::Document
   field :count, :type => Integer
   field :digest
-  field :timestamp, :type => Time
+  field :machines, :type => Array
+  field :first_timestamp, :type => Time
+  field :most_recent_timestamp, :type => Time
   field :most_recent_report_id, :type => Integer
   index :digest
-  index :timestamp
+  index :most_recent_timestamp
 
   # Cache most recent report so we can preload a bunch at once
   attr_accessor :most_recent_report

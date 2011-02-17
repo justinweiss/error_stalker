@@ -18,8 +18,10 @@ class InMemoryTest < Test::Unit::TestCase
     store_exception(@store, "test2")
 
     assert_equal 2, @store.recent.length
-    assert_equal 1, @store.group(@store.find(2).digest).length
-    assert_equal 2, @store.group(@store.find(0).digest).length
+    assert_equal 1, @store.reports_in_group(@store.find(2).digest).length
+    assert_equal 1, @store.group(@store.find(2).digest).count
+    assert_equal 2, @store.reports_in_group(@store.find(0).digest).length
+    assert_equal 2, @store.group(@store.find(0).digest).count
   end
 
   def store_exception(store, message = "failed", count = 1, data = {})

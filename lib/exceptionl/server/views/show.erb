@@ -4,9 +4,9 @@
 
 <dl class="group_details">
   <dt>Count</dt><dd><%= h(@group.count) %></dd>
-  <dt>First occurred</dt><dd><%= h(@group.last.timestamp) %></dd>
-  <dt>Most recently occurred</dt><dd><%= h(@group.first.timestamp) %></dd>
-  <dt>On machines</dt><dd><%= h(@group.map(&:machine).uniq.join(', ')) %></dd>
+  <dt>First occurred</dt><dd><%= h(@group.first_timestamp) %></dd>
+  <dt>Most recently occurred</dt><dd><%= h(@group.most_recent_timestamp) %></dd>
+  <dt>On machines</dt><dd><%= h(@group.machines.join(', ')) %></dd>
 </dl>
 <p><a href="/similar/<%= @report.digest%>.html">See all</a></p>
 <% plugins.each do |plugin| %>

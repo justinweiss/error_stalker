@@ -29,10 +29,14 @@ class Exceptionl::Store::InMemory < Exceptionl::Store::Base
     exception_report.id
   end
 
-  # returns the list of exceptions in the group matching +digest+, ordered by
-  # timestamp. 
-  def group(digest)
+  # Returns a list of exceptions whose digest is +digest+.
+  def reports_in_group(digest)
     exception_groups[digest]
+  end
+  
+  # returns the exception group matching +digest+
+  def group(digest)
+    build_group_for_exceptions(reports_in_group(digest))
   end
   
   # Empty this exception store. Useful for tests!
@@ -55,14 +59,22 @@ class Exceptionl::Store::InMemory < Exceptionl::Store::Base
   def recent
     data = []
     exception_groups.map do |digest, group|
-      data << Exceptionl::ExceptionGroup.new.tap do |g|
-        g.count = group.length
-        g.digest = digest
-        g.timestamp = group.last.timestamp
-        g.most_recent_report = group.last
-      end
+      data << build_group_for_exceptions(group)
     end
      
     data.reverse
+  end
+
+  protected
+
+  def build_group_for_exceptions(group)
+    Exceptionl::ExceptionGroup.new.tap do |g|
+      g.count = group.length
+      g.digest = group.first.digest
+      g.machines = group.map(&:machine).uniq
+      g.first_timestamp = group.first.timestamp
+      g.most_recent_timestamp = group.last.timestamp
+      g.most_recent_report = group.last
+    end
   end
 end
