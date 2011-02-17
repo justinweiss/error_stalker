@@ -74,12 +74,12 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
 
   # All applications that have been seen by this store
   def applications
-    Application.all.map(&:name)
+    Application.all.order_by(:name).map(&:name)
   end
 
   # All machines that have been seen by this store
   def machines
-    Machine.all.map(&:name)
+    Machine.all.order_by(:name).map(&:name)
   end
 
   # returns the group this exception is a part of, ordered by

@@ -10,7 +10,7 @@ group :server do
 end
 
 group :mongoid_store do
-  gem 'mongoid', '~>2.0.0.beta.20'
+  gem 'mongoid', '2.0.0.beta.20'
 end
 
 group :test do
