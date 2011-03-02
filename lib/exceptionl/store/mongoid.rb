@@ -148,12 +148,12 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
         '$addToSet' => {:machines => report.machine}
       },
       :upsert => true)
-    
+
     # Make sure the first_timestamp parameter is set. Unfortunately
     # mongoid doesn't have an $add modifier yet, so we have to do another query.
     ExceptionGroup.collection.update(
       {:digest => report.digest, :first_timestamp => nil},
-      {:first_timestamp => report.timestamp})
+      {'$set' => {:first_timestamp => report.timestamp}})
 
     # Update indexes to pre-populate the search dropdowns.
     Machine.collection.update(
@@ -165,7 +165,7 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
       {:name => report.application},
       {:name => report.application},
       :upsert => true)
-
+    
     report.id
   end
 end
