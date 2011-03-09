@@ -25,8 +25,10 @@
     <label for="type">Type</label>
     <input id="type" type="text" name="type" value="<%= params[:type] %>" />
 
-    <label for="data">Extra data (key:"value")</label>
-    <input id="data" type="text" name="data" value="<%= params[:data] %>" />
+    <% if store.supports_extended_searches? %>
+      <label for="data">Extra data (key:"value")</label>
+      <input id="data" type="text" name="data" value="<%= params[:data] %>" />
+    <% end %>
     
     <input type="submit" name="Search" value="Search" />
   </form>

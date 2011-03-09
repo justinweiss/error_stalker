@@ -69,7 +69,35 @@ class ServerTest < Test::Unit::TestCase
     report_exception('test', 1)
     assert_equal 2, Mail::TestMailer.deliveries.length
   end
-  
+
+  def test_advanced_search_shows_up
+    get "/search"
+    assert last_response.ok?
+    assert_no_match /<label for="data">/, last_response.body
+
+    @store.stubs(:supports_extended_searches?).returns(true)
+    get "/search"
+    assert last_response.ok?
+    assert_match /<label for="data">/, last_response.body
+  end
+
+  def test_perform_search
+    report_exception('test', 4)
+    report_exception('te-t')
+    get "/search?application=&machine=&exception=test&Search=Search"
+    assert_match /exceptions\/0.html/, last_response.body
+    assert_no_match /exceptions\/4.html/, last_response.body
+
+    get "/search?application=&machine=&exception=te&Search=Search"
+    assert_match /exceptions\/0.html/, last_response.body
+    assert_match /exceptions\/4.html/, last_response.body
+
+    get "/search?application=foo&machine=&exception=te&Search=Search"
+    assert_no_match /exceptions\/0.html/, last_response.body
+    assert_no_match /exceptions\/4.html/, last_response.body
+  end
+
+  protected
   def report_exception(message = "failed", count = 1, data = {})
     e = nil
     count.times do 

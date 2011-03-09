@@ -1,4 +1,5 @@
 require 'exceptionl/store/base'
+require 'set'
 
 # The simplest exception store. This just stores each reported
 # exception in a list held in memory. This, of course, means that the
@@ -14,6 +15,12 @@ class Exceptionl::Store::InMemory < Exceptionl::Store::Base
   # A hash of exceptions indexed by digest.
   attr_reader :exception_groups
 
+  # All the machines that have seen exceptions
+  attr_reader :machines
+
+  # All the applications that have seen exceptions
+  attr_reader :applications
+
   # Creates a new instance of this store.
   def initialize
     clear
@@ -23,6 +30,8 @@ class Exceptionl::Store::InMemory < Exceptionl::Store::Base
   # the exception into the appropriate exception group.
   def store(exception_report)
     @exceptions << exception_report
+    self.machines << exception_report.machine
+    self.applications << exception_report.application
     exception_report.id = exceptions.length - 1
     exception_groups[exception_report.digest] ||= []
     exception_groups[exception_report.digest] << exception_report
@@ -43,6 +52,18 @@ class Exceptionl::Store::InMemory < Exceptionl::Store::Base
   def clear
     @exceptions = []
     @exception_groups = {}
+    @machines = Set.new
+    @applications = Set.new
+  end
+  
+  # Searches for exception reports maching +params+.
+  def search(params = {})
+    results = exceptions
+    results = results.select {|e| e.machine == params[:machine]} if params[:machine] && !params[:machine].empty?
+    results = results.select {|e| e.application == params[:application]} if params[:application] && !params[:application].empty?
+    results = results.select {|e| e.exception.to_s =~ /#{params[:exception]}/} if params[:exception] && !params[:exception].empty?
+    results = results.select {|e| e.type.to_s =~ /#{params[:type]}/} if params[:type] && !params[:type].empty?
+    results.reverse
   end
 
   # Find an exception report with the given id.

@@ -24,6 +24,25 @@ class InMemoryTest < Test::Unit::TestCase
     assert_equal 2, @store.group(@store.find(0).digest).count
   end
 
+  def test_search
+    store_exception(@store, "test", 2)
+    store_exception(@store, "text")
+    assert_equal 3, @store.search(:application => 'test').length
+    assert_equal 0, @store.search(:application => 'foo').length
+    assert_equal 3, @store.search(:machine => `hostname`.chomp, :application => 'test').length
+    assert_equal 0, @store.search(:machine => 'example.com', :application => 'test').length
+    assert_equal 1, @store.search(:application => 'test', :exception => 'tex').length
+    assert_equal 3, @store.search(:application => 'test', :exception => 'te').length
+  end
+
+  def test_machines_and_applications
+    store_exception(@store, "test", 2)
+    assert_equal 1, @store.machines.length
+    assert_equal 1, @store.applications.length
+    assert_equal 'test', @store.applications.first
+  end
+  
+  protected
   def store_exception(store, message = "failed", count = 1, data = {})
     e = nil
     count.times do 

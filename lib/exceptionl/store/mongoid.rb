@@ -76,6 +76,11 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
     ExceptionGroup.where(:digest => digest).first
   end
 
+  # Does this store support searching through the data blob?
+  def supports_extended_searches?
+    true
+  end
+
   # Searches for exception reports maching +params+. Supports querying
   # by arbitrary data in the +data+ hash associated with the exception, with the format:
   #
@@ -102,7 +107,7 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
       end
     end
     
-    scope.order_by(:most_recent_timestamp.desc)
+    scope.order_by(:timestamp.desc)
   end
 
   # Creates the MongoDB indexes used by this driver. Should be called

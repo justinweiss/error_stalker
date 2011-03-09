@@ -37,6 +37,21 @@ module Exceptionl::Store
     def reports_in_group(digest)
       raise NotImplementedError, "Must be implemented by child class"
     end
+
+    # A list of all the applications that have seen exceptions
+    def applications
+      raise NotImplementedError, "Must be implemented by child class"
+    end
+
+    # A list of all the machines that have seen exceptions
+    def machines
+      raise NotImplementedError, "Must be implemented by child class"
+    end
+
+    # Does this store support searching through the data blob?
+    def supports_extended_searches?
+      false
+    end
     
     # Searches for exception reports maching +params+. Search should
     # support searching by application name, machine name, exception
@@ -44,6 +59,7 @@ module Exceptionl::Store
     # attributes of Exceptionl::ExceptionReport, and the results
     # should be ordered by timestamp from newest to oldest.
     def search(params)
+      raise NotImplementedError, "Must be implemented by child class"
     end
   end
 end
