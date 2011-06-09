@@ -1,5 +1,1 @@
-<% if @exception.type == "ActionView::TemplateError" %>
-  <%= h @exception.exception.to_s.split(/on line #/).first %>
-<% else %>
-  <%= h @exception.exception.to_s %>
-<% end %>
+<%= h @exception.exception.to_s %>
