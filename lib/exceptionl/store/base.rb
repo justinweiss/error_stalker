@@ -53,6 +53,16 @@ module Exceptionl::Store
       false
     end
     
+    # Returns the total number of exceptions
+    def total
+      raise NotImplementedError, "Must be implemented by child class"      
+    end
+    
+    # Returns the total number of exceptions since +timestamp+
+    def total_since(timestamp)
+      raise NotImplementedError, "Must be implemented by child class"
+    end
+    
     # Searches for exception reports maching +params+. Search should
     # support searching by application name, machine name, exception
     # name, and exception type. The keys in +params+ should match

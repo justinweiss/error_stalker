@@ -8,6 +8,7 @@ require 'erb'
 require 'will_paginate'
 require 'will_paginate/view_helpers/base'
 require 'exceptionl/sinatra_link_renderer'
+require 'exceptionl/version'
 
 module Exceptionl
   # The Exceptionl server. Provides a UI for browsing, grouping, and
@@ -126,6 +127,18 @@ module Exceptionl
       else
         404
       end
+    end
+    
+    get '/stats.json' do
+      timestamp = Time.at(params[:timestamp].to_i) if params[:timestamp]
+      # default to 1 hour ago
+      timestamp ||= Time.now - (60*60)
+      stats = {}
+      stats[:timestamp] = timestamp.to_i
+      stats[:total_since] = store.total_since(timestamp)
+      stats[:total] = store.total
+      stats[:version] = Exceptionl::VERSION
+      stats.to_json
     end
 
     post '/report.json' do

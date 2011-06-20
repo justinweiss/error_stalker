@@ -85,6 +85,14 @@ class Exceptionl::Store::InMemory < Exceptionl::Store::Base
      
     data.reverse
   end
+  
+  def total
+    @exceptions.count
+  end
+  
+  def total_since(timestamp)
+    @exceptions.select { |e| e.timestamp >= timestamp.to_s }.length
+  end
 
   protected
 

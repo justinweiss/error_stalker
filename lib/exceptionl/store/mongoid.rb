@@ -80,6 +80,14 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
   def supports_extended_searches?
     true
   end
+  
+  def total
+    ExceptionReport.count()
+  end
+  
+  def total_since(timestamp)
+    ExceptionReport.where(:timestamp.gte => timestamp).count()
+  end
 
   # Searches for exception reports maching +params+. Supports querying
   # by arbitrary data in the +data+ hash associated with the exception, with the format:

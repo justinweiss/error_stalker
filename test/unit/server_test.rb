@@ -69,6 +69,32 @@ class ServerTest < Test::Unit::TestCase
     report_exception('test', 1)
     assert_equal 2, Mail::TestMailer.deliveries.length
   end
+  
+  def test_stats_renders_total
+    report_exception('test', 4)
+    get "/stats.json"
+    assert last_response.ok?
+    stats = JSON.parse(last_response.body)
+    assert_equal 4, stats['total']
+  end
+  
+  def test_stats_renders_timestamp
+    report_exception('test', 1)
+    timestamp = Time.now.to_i - 60 # one minute ago
+    get "/stats.json", :timestamp => timestamp
+    assert last_response.ok?
+    stats = JSON.parse(last_response.body)
+    assert_equal timestamp, stats['timestamp']
+  end
+
+  def test_stats_renders_total_since
+    report_exception('test', 1)
+    timestamp = Time.now.to_i - 60 # one minute ago
+    get "/stats.json", :timestamp => timestamp
+    assert last_response.ok?
+    stats = JSON.parse(last_response.body)
+    assert_equal 1, stats['total_since']
+  end
 
   def test_advanced_search_shows_up
     get "/search"
