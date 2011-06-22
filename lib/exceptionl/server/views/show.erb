@@ -7,6 +7,7 @@
   <dt>First occurred</dt><dd><%= h(@group.first_timestamp) %></dd>
   <dt>Most recently occurred</dt><dd><%= h(@group.most_recent_timestamp) %></dd>
   <dt>On machines</dt><dd><%= h(@group.machines.join(', ')) %></dd>
+  <dt>Exception class</dt><dd><%= h(@group.type) %></dd>
 </dl>
 <p><a href="/similar/<%= @report.digest%>.html">See all</a></p>
 <% plugins.each do |plugin| %>

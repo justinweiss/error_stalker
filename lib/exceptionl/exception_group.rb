@@ -21,4 +21,9 @@ class Exceptionl::ExceptionGroup
 
   # The most recent ExceptionReport instance belonging to this group
   attr_accessor :most_recent_report
+  
+  def type
+    most_recent_report.type unless most_recent_report.nil?
+  end
+  
 end
