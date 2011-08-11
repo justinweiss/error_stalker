@@ -1,3 +1,106 @@
-= Exception Logger
+= ErrorStalker
 
-As the name says, this library allows you to log exceptions to an arbitrary backend.
+ErrorStalker is an extensible exception monitor for Ruby apps. 
+
+== Getting Started
+
+After installing the gem, you should require it:
+
+  require 'error_stalker'
+
+Afterwards, reporting exceptions is simple: 
+
+  ErrorStalker::Client.report(application_name, exception, extra_data)
+
+This will report an exception to ErrorStalker.
+
+In Rails, you should be able to put this code in your
+ApplicationController to report all exceptions:
+
+  rescue_from Exception do |exception|
+    ErrorStalker::Client.report(application_name, exception)
+    raise exception
+  end
+
+== The ErrorStalker Server
+
+ErrorStalker has decent defaults for running in development -- when
+you call ErrorStalker::Client.report, it logs the exception to a
+logfile. If you're inside a Rails app, it will log to
+log/exceptions.log, otherwise it will put the logfile in
+/tmp/exceptions.log. 
+
+This is probably not what you want in production, so ErrorStalker
+supports different backends, and comes stock with an ErrorStalker
+Sinatra server that can persist, aggregate, and show the exceptions
+your app is raising. Switching backends can be done like this:
+
+  require 'error_stalker/backend/server'
+  ErrorStalker::Client.backend = ErrorStalker::Backend::Server.new(:host => "localhost", :port => 8080)
+
+From that point on, all exceptions will be posted to the ErrorStalker server running on localhost:8080.
+
+That server is a standard Sinatra app, but you still need to run
+it. You can do that by pointing your favorite rack-enabled server at a
+config.ru that looks like this:
+
+  require 'error_stalker/server'
+  
+  ErrorStalker::Server.configuration = {
+    ... # server config goes here
+  }
+  
+  run ErrorStalker::Server
+
+== Data Stores
+
+The server takes two main bits of configuration. The most important is
+the data store. Currently, the server supports an in-memory data store
+(which will go away when the server does) and a persistent mongodb store (using
+mongoid). You can configure these with a hash before you start the server:
+
+  ErrorStalker::Server.configuration = {
+    'store' => {
+      'class' => 'ErrorStalker::Store::Mongoid',
+      'parameters' => '/path/to/mongoid.yml'
+    }
+  }
+
+Each data store should call out the parameters it supports in its
+documentation.
+
+== Plugins
+
+The ErrorStalker server also supports a simple plugin
+architecture. Currently, it supports a simple lighthouse reporter and
+an automatic email sender. Documentation for these plugins is in the
+Rdoc for the specific classes. They are configured the same way as the
+data store:
+
+  ErrorStalker::Server.configuration = {
+    'store' => {
+      'class' => 'ErrorStalker::Store::Mongoid',
+      'parameters' => '/path/to/mongoid.yml'
+    },
+    'plugin' => [
+      {
+        'class' => 'ErrorStalker::Plugin::EmailSender',
+        'parameters' => {
+          'to' => 'to_address@example.com',
+          'from' => 'from_address@example.com'
+        }
+      },
+      ...
+    ]
+  }
+
+== Extending ExceptionStalker
+
+Feel free to write your own backends, stores, or plugins as you need
+them. As long as you follow the documentation in the ::Base classes,
+your code should fit right in. Let me know what you come up with!
+
+== License
+
+Regardless of what any other file may say about it, this code is
+licensed under the MIT license.
