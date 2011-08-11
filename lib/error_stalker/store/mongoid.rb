@@ -1,12 +1,12 @@
 require 'mongoid'
-require 'exceptionl/store/base'
+require 'error_stalker/store/base'
 
 # Store exceptions using MongoDB. This store provides fast storage and
 # querying of exceptions, and long-term persistence. It also allows
 # querying based on arbitrary data stored in the +data+ hash of the
 # exception report, which allows for crazy things like searching
 # reports by URL or IP address. 
-class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
+class ErrorStalker::Store::Mongoid < ErrorStalker::Store::Base
   
   # Configure mongoid from the mongoid config file found in
   # +config_file+. This mongoid config file should be similar to the
@@ -122,8 +122,8 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
   # at some point after deciding to use the mongoid store. Can be
   # called either manually, or by running <tt>bin/create_indexes</tt>
   def create_indexes
-    Exceptionl::Store::Mongoid::ExceptionReport.create_indexes
-    Exceptionl::Store::Mongoid::ExceptionGroup.create_indexes
+    ErrorStalker::Store::Mongoid::ExceptionReport.create_indexes
+    ErrorStalker::Store::Mongoid::ExceptionGroup.create_indexes
   end
 
   # Migrate the data in the mongoid database to a newer format. This
@@ -148,7 +148,7 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
 
   protected
 
-  # In order to make Exceptionl super-fast, we keep a bunch of cached
+  # In order to make ErrorStalker super-fast, we keep a bunch of cached
   # data (like exception report groups, machines, and
   # applications). +update_caches+ updates all of this cached data
   # when an exception report comes in.
@@ -184,7 +184,7 @@ class Exceptionl::Store::Mongoid < Exceptionl::Store::Base
 end
 
 # Keeps track of the migrations we've run so far.
-class Exceptionl::Store::Mongoid::SchemaMigrations
+class ErrorStalker::Store::Mongoid::SchemaMigrations
   include Mongoid::Document
   field :version
 end
@@ -192,7 +192,7 @@ end
 # A cache of all the applications that have had exception reports seen
 # by this server, so we don't have to search the entire DB to populate
 # the search dropdown.
-class Exceptionl::Store::Mongoid::Application
+class ErrorStalker::Store::Mongoid::Application
   include Mongoid::Document
   field :name
 end
@@ -200,7 +200,7 @@ end
 # A cache of all the machines that have had exception reports seen by
 # this server, so we don't have to search the entire DB to populate
 # the search dropdown.
-class Exceptionl::Store::Mongoid::Machine
+class ErrorStalker::Store::Mongoid::Machine
   include Mongoid::Document
   field :name
 end
@@ -208,7 +208,7 @@ end
 # Aggregates exceptions for for the 'recent exceptions' list. This is
 # way faster than mapreducing on demand, although it requires some
 # crazy code to preload all the exceptions.
-class Exceptionl::Store::Mongoid::ExceptionGroup < Exceptionl::ExceptionGroup
+class ErrorStalker::Store::Mongoid::ExceptionGroup < ErrorStalker::ExceptionGroup
   include Mongoid::Document
   field :count, :type => Integer
   field :digest
@@ -239,7 +239,7 @@ class Exceptionl::Store::Mongoid::ExceptionGroup < Exceptionl::ExceptionGroup
     # associated exception reports.
     def paginate(pagination_opts = {})
       recent = @criteria.paginate(pagination_opts)
-      exceptions = Exceptionl::Store::Mongoid::ExceptionReport.where(:_id.in => recent.map(&:most_recent_report_id))
+      exceptions = ErrorStalker::Store::Mongoid::ExceptionReport.where(:_id.in => recent.map(&:most_recent_report_id))
       # Fake association preloading
       id_map = {}.tap do |h|
         exceptions.each do |ex|
@@ -256,10 +256,10 @@ class Exceptionl::Store::Mongoid::ExceptionGroup < Exceptionl::ExceptionGroup
   end
 end
 
-# The mongoid version of Exceptionl::ExceptionReport. This class
+# The mongoid version of ErrorStalker::ExceptionReport. This class
 # is used for mongo-specific querying and persistence of
 # ExceptionReports, while base ExceptionReports are store-agnostic.
-class Exceptionl::Store::Mongoid::ExceptionReport
+class ErrorStalker::Store::Mongoid::ExceptionReport
   include Mongoid::Document
   field :application
   field :machine
@@ -274,7 +274,7 @@ class Exceptionl::Store::Mongoid::ExceptionReport
   index :data
   index :timestamp
 
-  # Generates an Exceptionl::ExceptionReport from this model,
+  # Generates an ErrorStalker::ExceptionReport from this model,
   # converting the +data+ field from a list of key-value pairs to a
   # full-fledged hash. Internally, we store it as a list of key->value
   # to support fast multiattribute indexing, one of the cooler mongo
@@ -291,7 +291,7 @@ class Exceptionl::Store::Mongoid::ExceptionReport
       end
     end
     
-    Exceptionl::ExceptionReport.new(params)
+    ErrorStalker::ExceptionReport.new(params)
   end
   
   # Create a new mongoid exception report from +exception_report+.

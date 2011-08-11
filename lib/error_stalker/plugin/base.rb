@@ -1,10 +1,10 @@
-# The base Exceptionl::Plugin, that all plugins should inherit
+# The base ErrorStalker::Plugin, that all plugins should inherit
 # from. Provides default implementations of all the supported plugin
 # methods, so you can (and should) call +super+ in your plugin subclasses.
-class Exceptionl::Plugin::Base
+class ErrorStalker::Plugin::Base
 
   # Create a new instance of this plugin. +app+ is the sinatra
-  # Exceptionl::Server instance, and +params+ is an arbitrary hash of
+  # ErrorStalker::Server instance, and +params+ is an arbitrary hash of
   # plugin-specific parameters or options.
   def initialize(app, params = {})
   end

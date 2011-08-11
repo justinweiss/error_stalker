@@ -1,28 +1,28 @@
 require 'sinatra/base'
 
 $: << File.expand_path('..', File.dirname(__FILE__))
-require 'exceptionl'
-require 'exceptionl/store'
-require 'exceptionl/plugin'
+require 'error_stalker'
+require 'error_stalker/store'
+require 'error_stalker/plugin'
 require 'erb'
 require 'will_paginate'
 require 'will_paginate/view_helpers/base'
-require 'exceptionl/sinatra_link_renderer'
-require 'exceptionl/version'
+require 'error_stalker/sinatra_link_renderer'
+require 'error_stalker/version'
 
-module Exceptionl
-  # The Exceptionl server. Provides a UI for browsing, grouping, and
+module ErrorStalker
+  # The ErrorStalker server. Provides a UI for browsing, grouping, and
   # searching exception reports, as well as a centralized store for
   # keeping exception reports. As a Sinatra app, this can be run using
   # a config.ru file or something like Vegas. A sample Vegas runner
-  # for the server is located in <tt>bin/exceptionl_server</tt>.
+  # for the server is located in <tt>bin/error_stalker_server</tt>.
   class Server < Sinatra::Base
 
     # The number of exceptions or exception groups to show on each
     # page.
     PER_PAGE = 25
 
-    # The data store (Exceptionl::Store instance) to use to store
+    # The data store (ErrorStalker::Store instance) to use to store
     # exception data
     attr_accessor :store 
     
@@ -66,8 +66,8 @@ module Exceptionl
     end
     self.configuration = {}
 
-    # The default Exceptionl::Store subclass to use by default for
-    # this Exceptionl::Server instance. This is defined as a class
+    # The default ErrorStalker::Store subclass to use by default for
+    # this ErrorStalker::Server instance. This is defined as a class
     # method as well as an instance method so that it can be set by a
     # configuration file before rack creates the instance of this
     # sinatra app.
@@ -76,7 +76,7 @@ module Exceptionl
         store_class = configuration['store']['class'].split('::').inject(Object) {|mod, string| mod.const_get(string)}
         store_class.new(*Array(configuration['store']['parameters']))
       else
-        Exceptionl::Store::InMemory.new
+        ErrorStalker::Store::InMemory.new
       end
     end
 
@@ -137,12 +137,12 @@ module Exceptionl
       stats[:timestamp] = timestamp.to_i
       stats[:total_since] = store.total_since(timestamp)
       stats[:total] = store.total
-      stats[:version] = Exceptionl::VERSION
+      stats[:version] = ErrorStalker::VERSION
       stats.to_json
     end
 
     post '/report.json' do
-      report = Exceptionl::ExceptionReport.new(JSON.parse(request.body.read))
+      report = ErrorStalker::ExceptionReport.new(JSON.parse(request.body.read))
       report.id = store.store(report)
       plugins.each {|p| p.after_create(self, report)}
       200

@@ -1,6 +1,6 @@
 require 'will_paginate/view_helpers/link_renderer'
 
-module Exceptionl
+module ErrorStalker
   # +will_paginate+ doesn't have built-in sinatra support, so this
   # LinkRenderer subclass implements the +url+ method to work with
   # sinatra-style request hashes.
@@ -22,4 +22,4 @@ module Exceptionl
   end
 end
 
-WillPaginate::ViewHelpers.pagination_options[:renderer] = Exceptionl::SinatraLinkRenderer
+WillPaginate::ViewHelpers.pagination_options[:renderer] = ErrorStalker::SinatraLinkRenderer

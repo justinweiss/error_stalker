@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "exceptionl/version"
+require "error_stalker/version"
 
 Gem::Specification.new do |s|
-  s.name        = "exceptionl"
-  s.version     = Exceptionl::VERSION
+  s.name        = "error_stalker"
+  s.version     = ErrorStalker::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Justin Weiss"]
   s.email       = ["jweiss@avvo.com"]
@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.summary     = %q{Logs exceptions to a pluggable backend and/or a pluggable store}
   s.description = %q{Logs exceptions to a pluggable backend. Also provides a server for centralized exception logging using a pluggable data store.}
 
-  s.rubyforge_project = "exceptionl"
+  s.rubyforge_project = "error_stalker"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")

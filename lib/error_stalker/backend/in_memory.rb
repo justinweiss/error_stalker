@@ -1,7 +1,7 @@
 # Provides an in-memory backend that stores all exception reports in
 # an array. This is mostly useful for tests, and probably shouldn't be
 # used in real code.
-class Exceptionl::Backend::InMemory < Exceptionl::Backend::Base
+class ErrorStalker::Backend::InMemory < ErrorStalker::Backend::Base
 
   # A list of exceptions stored in this backend.
   attr_reader :exceptions

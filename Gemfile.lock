@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    exceptionl (0.0.10)
+    error_stalker (0.0.12)
 
 GEM
   remote: http://rubygems.org/
@@ -64,7 +64,7 @@ PLATFORMS
 
 DEPENDENCIES
   addressable (~> 2.2.2)
-  exceptionl!
+  error_stalker!
   json (= 1.4.6)
   lighthouse-api (= 2.0)
   mail (~> 2.2.15)

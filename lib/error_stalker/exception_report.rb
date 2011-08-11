@@ -6,7 +6,7 @@ require 'digest/md5'
 # needed for further investigation. Some data stores may override this
 # class, but they should be able to be treated as instances of this
 # class regardless.
-class Exceptionl::ExceptionReport
+class ErrorStalker::ExceptionReport
   
   # The name of the application that caused this exception. 
   attr_reader :application

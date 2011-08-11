@@ -2,7 +2,7 @@ require 'test_helper'
 
 class InMemoryTest < Test::Unit::TestCase
   def setup
-    @store = Exceptionl::Store::InMemory.new
+    @store = ErrorStalker::Store::InMemory.new
   end
   
   def test_store_exception
@@ -49,7 +49,7 @@ class InMemoryTest < Test::Unit::TestCase
       begin
         raise NoMethodError, message
       rescue => ex
-        e = Exceptionl::ExceptionReport.new(:exception => ex, :application => 'test', :data => data)
+        e = ErrorStalker::ExceptionReport.new(:exception => ex, :application => 'test', :data => data)
       end
       @store.store(e)
     end

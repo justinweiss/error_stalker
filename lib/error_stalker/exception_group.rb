@@ -2,7 +2,7 @@
 # so that we don't get overwhelmed by duplicate exceptions. Some
 # Exceptional::Stores may subclass and override this class, but the attributes
 # called out here should always be valid.
-class Exceptionl::ExceptionGroup
+class ErrorStalker::ExceptionGroup
   # The number of times this exception has been reported
   attr_accessor :count
 

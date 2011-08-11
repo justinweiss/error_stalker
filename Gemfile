@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-# Specify your gem's dependencies in exceptionl.gemspec
+# Specify your gem's dependencies in error_stalker.gemspec
 gemspec
 
 group :server do

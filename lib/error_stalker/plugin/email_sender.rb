@@ -3,7 +3,7 @@ require 'mail'
 # The email sender plugin will send an email to an address the first
 # time an exception in a group is reported. Future exceptions that go
 # in the same group will not trigger emails.
-class Exceptionl::Plugin::EmailSender < Exceptionl::Plugin::Base
+class ErrorStalker::Plugin::EmailSender < ErrorStalker::Plugin::Base
 
   # Parameters that are used in order to figure out how and where to
   # send the report email. These parameters are passed directly to the

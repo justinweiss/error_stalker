@@ -1,26 +1,26 @@
 require 'json'
 require 'net/http'
 
-# Stores reported exceptions to a central Exceptionl server (a Rack
-# server pointing to an Exceptionl::Server instance). The most
-# complicated Exceptionl backend, it is also the most powerful. This
+# Stores reported exceptions to a central ErrorStalker server (a Rack
+# server pointing to an ErrorStalker::Server instance). The most
+# complicated ErrorStalker backend, it is also the most powerful. This
 # is probably what you want to be using in production.
-class Exceptionl::Backend::Server < Exceptionl::Backend::Base
+class ErrorStalker::Backend::Server < ErrorStalker::Backend::Base
 
-  # The hostname of the Exceptionl server
+  # The hostname of the ErrorStalker server
   attr_accessor :host
 
-  # The Exceptionl server's port
+  # The ErrorStalker server's port
   attr_accessor :port
 
   # http or https
   attr_accessor :protocol
 
-  # The path of the Exceptionl server, if applicable
+  # The path of the ErrorStalker server, if applicable
   attr_accessor :path 
   
   # Creates a new Server backend instance that will report exceptions
-  # to a centralized Exceptionl server.
+  # to a centralized ErrorStalker server.
   def initialize(params = {})
     @protocol = params[:protocol] || 'http://'
     @host = params[:host] || 'localhost'
@@ -28,7 +28,7 @@ class Exceptionl::Backend::Server < Exceptionl::Backend::Base
     @path = params[:path] || ''
   end
 
-  # Reports +exception_report+ to a central Exceptionl server.
+  # Reports +exception_report+ to a central ErrorStalker server.
   def report(exception_report)
     req = Net::HTTP::Post.new("#{path}/report.json")
     req["content-type"] = "application/json"

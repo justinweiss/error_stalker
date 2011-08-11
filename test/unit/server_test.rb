@@ -1,6 +1,6 @@
 require 'test_helper'
 require 'rack/test'
-require 'exceptionl/server'
+require 'error_stalker/server'
 require 'mocha'
 
 ENV['RACK_ENV'] = 'test'
@@ -9,12 +9,12 @@ class ServerTest < Test::Unit::TestCase
   include Rack::Test::Methods
 
   def app
-    Exceptionl::Server
+    ErrorStalker::Server
   end
 
   def setup
-    @store = Exceptionl::Store::InMemory.new
-    Exceptionl::Server.any_instance.stubs(:store).returns(@store)
+    @store = ErrorStalker::Store::InMemory.new
+    ErrorStalker::Server.any_instance.stubs(:store).returns(@store)
   end
 
   def test_report_exception
@@ -63,7 +63,7 @@ class ServerTest < Test::Unit::TestCase
   end
 
   def test_emails_sent_only_on_first_report_in_group
-    app.any_instance.stubs(:plugins).returns([Exceptionl::Plugin::EmailSender.new(nil, {'to' => nil, 'from' => nil})])
+    app.any_instance.stubs(:plugins).returns([ErrorStalker::Plugin::EmailSender.new(nil, {'to' => nil, 'from' => nil})])
     report_exception('test', 2)
     assert_equal 1, Mail::TestMailer.deliveries.length
     report_exception('test', 1)
@@ -130,7 +130,7 @@ class ServerTest < Test::Unit::TestCase
       begin
         raise NoMethodError, message
       rescue => ex
-        e = Exceptionl::ExceptionReport.new(:exception => ex, :application => 'test', :data => data)
+        e = ErrorStalker::ExceptionReport.new(:exception => ex, :application => 'test', :data => data)
       end
       
       post '/report.json', e.to_json

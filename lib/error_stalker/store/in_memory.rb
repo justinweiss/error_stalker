@@ -1,4 +1,4 @@
-require 'exceptionl/store/base'
+require 'error_stalker/store/base'
 require 'set'
 
 # The simplest exception store. This just stores each reported
@@ -7,7 +7,7 @@ require 'set'
 # might take up tons of memory, and searching will probably be
 # slow. In other words, this is a terrible choice for production. On
 # the other hand, this store is especially useful for tests.
-class Exceptionl::Store::InMemory < Exceptionl::Store::Base
+class ErrorStalker::Store::InMemory < ErrorStalker::Store::Base
 
   # The list of exceptions reported so far.
   attr_reader :exceptions
@@ -97,7 +97,7 @@ class Exceptionl::Store::InMemory < Exceptionl::Store::Base
   protected
 
   def build_group_for_exceptions(group)
-    Exceptionl::ExceptionGroup.new.tap do |g|
+    ErrorStalker::ExceptionGroup.new.tap do |g|
       g.count = group.length
       g.digest = group.first.digest
       g.machines = group.map(&:machine).uniq

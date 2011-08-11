@@ -3,7 +3,7 @@ require 'yaml'
 # A backend that logs all exception reports to a file. This is
 # probably what you want to be running in development mode, and is
 # also the default backend.
-class Exceptionl::Backend::LogFile < Exceptionl::Backend::Base
+class ErrorStalker::Backend::LogFile < ErrorStalker::Backend::Base
 
   # The name of the file containing the exception reports
   attr_reader :filename

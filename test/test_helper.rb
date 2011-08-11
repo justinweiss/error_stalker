@@ -1,7 +1,7 @@
 require 'test/unit'
-require 'exceptionl'
+require 'error_stalker'
 require 'mail'
-require 'exceptionl/server'
+require 'error_stalker/server'
 
 Mail.defaults do
   delivery_method :test

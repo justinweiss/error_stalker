@@ -1,6 +1,6 @@
-require 'exceptionl/exception_group'
+require 'error_stalker/exception_group'
 
-module Exceptionl::Store
+module ErrorStalker::Store
   # The base store that all other exception stores should inherit
   # from. All methods on this class must be inherited by subclasses,
   # and the methods that return multiple objects must support
@@ -13,7 +13,7 @@ module Exceptionl::Store
     end
 
     # Return the most recent exception groups. Should return an array
-    # of Exceptionl::ExceptionGroup objects.
+    # of ErrorStalker::ExceptionGroup objects.
     def recent
       raise NotImplementedError, "Must be implemented by child class"
     end
@@ -66,7 +66,7 @@ module Exceptionl::Store
     # Searches for exception reports maching +params+. Search should
     # support searching by application name, machine name, exception
     # name, and exception type. The keys in +params+ should match
-    # attributes of Exceptionl::ExceptionReport, and the results
+    # attributes of ErrorStalker::ExceptionReport, and the results
     # should be ordered by timestamp from newest to oldest.
     def search(params)
       raise NotImplementedError, "Must be implemented by child class"

@@ -4,7 +4,7 @@ require 'lighthouse'
 # {Lighthouse}[http://lighthouseapp.com]. When this plugin is enabled,
 # a new link will show up on the exception detail page that
 # pre-populates a form for sending the exception report to Lighthouse.
-class Exceptionl::Plugin::LighthouseReporter < Exceptionl::Plugin::Base
+class ErrorStalker::Plugin::LighthouseReporter < ErrorStalker::Plugin::Base
 
   # The lighthouse project id that this plugin will report bugs to.
   attr_reader :project_id
@@ -59,7 +59,7 @@ class Exceptionl::Plugin::LighthouseReporter < Exceptionl::Plugin::Base
     ticket.save
   end
 
-  # Extra actions that will be added to the Exceptionl::Server
+  # Extra actions that will be added to the ErrorStalker::Server
   # instance when this plugin is enabled. Provides actions for
   # creating a new Lighthouse ticket with exception details and
   # posting the ticket to Lighthouse. This module also adds a
@@ -67,7 +67,7 @@ class Exceptionl::Plugin::LighthouseReporter < Exceptionl::Plugin::Base
   # build and send tickets to Lighthouse.
   module Actions
 
-    # Adds the actions described above to the Exceptionl::Server
+    # Adds the actions described above to the ErrorStalker::Server
     # instance.
     def self.included(base)
       base.class_eval do
