@@ -6,8 +6,6 @@ require 'error_stalker/store'
 require 'error_stalker/plugin'
 require 'erb'
 require 'will_paginate'
-require 'will_paginate/view_helpers/base'
-require 'error_stalker/sinatra_link_renderer'
 require 'error_stalker/version'
 
 module ErrorStalker
@@ -24,20 +22,20 @@ module ErrorStalker
 
     # The data store (ErrorStalker::Store instance) to use to store
     # exception data
-    attr_accessor :store 
-    
+    attr_accessor :store
+
     # A list of plugins the server will use.
     attr_accessor :plugins
-    
+
     set :root, File.dirname(__FILE__)
     set :public, Proc.new { File.join(root, "server/public") }
     set :views, Proc.new { File.join(root, "server/views") }
 
+    register WillPaginate::Sinatra
+
     helpers do
       include Rack::Utils
       alias_method :h, :escape_html
-
-      include WillPaginate::ViewHelpers::Base
 
       # Generates a url from an array of strings representing the
       # parts of the path.
@@ -62,7 +60,7 @@ module ErrorStalker
     class << self
       # A hash of configuration options, usually read from a
       # configuration file.
-      attr_accessor :configuration 
+      attr_accessor :configuration
     end
     self.configuration = {}
 
@@ -99,7 +97,7 @@ module ErrorStalker
       end
       self.store = self.class.store
     end
-    
+
     get '/' do
       @records = store.recent.paginate(:page => params[:page], :per_page => PER_PAGE)
       erb :index
@@ -109,7 +107,7 @@ module ErrorStalker
       @results = store.search(params).paginate(:page => params[:page], :per_page => PER_PAGE) if params["Search"]
       erb :search
     end
-    
+
     get '/similar/:digest.html' do
       @group = store.reports_in_group(params[:digest]).paginate(:page => params[:page], :per_page => PER_PAGE)
       if @group
@@ -118,7 +116,7 @@ module ErrorStalker
         404
       end
     end
-    
+
     get '/exceptions/:id.html' do
       @report = store.find(params[:id])
       if @report
@@ -128,7 +126,7 @@ module ErrorStalker
         404
       end
     end
-    
+
     get '/stats.json' do
       timestamp = Time.at(params[:timestamp].to_i) if params[:timestamp]
       # default to 1 hour ago
@@ -147,6 +145,6 @@ module ErrorStalker
       plugins.each {|p| p.after_create(self, report)}
       200
     end
-    
+
   end
 end

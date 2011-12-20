@@ -1,13 +1,15 @@
 require 'mongoid'
 require 'error_stalker/store/base'
+require 'error_stalker/will_paginate/mongoid'
+require 'will_paginate/array'
 
 # Store exceptions using MongoDB. This store provides fast storage and
 # querying of exceptions, and long-term persistence. It also allows
 # querying based on arbitrary data stored in the +data+ hash of the
 # exception report, which allows for crazy things like searching
-# reports by URL or IP address. 
+# reports by URL or IP address.
 class ErrorStalker::Store::Mongoid < ErrorStalker::Store::Base
-  
+
   # Configure mongoid from the mongoid config file found in
   # +config_file+. This mongoid config file should be similar to the
   # one on http://mongoid.org/docs/installation/, and must be indexed
@@ -69,7 +71,7 @@ class ErrorStalker::Store::Mongoid < ErrorStalker::Store::Base
   def reports_in_group(digest)
     ExceptionReport.where(:digest => digest).order_by(:timestamp.desc)
   end
-  
+
   # returns the ExceptionGroup object corresponding to a particular
   # digest
   def group(digest)
@@ -80,11 +82,11 @@ class ErrorStalker::Store::Mongoid < ErrorStalker::Store::Base
   def supports_extended_searches?
     true
   end
-  
+
   def total
     ExceptionReport.count()
   end
-  
+
   def total_since(timestamp)
     ExceptionReport.where(:timestamp.gte => timestamp).count()
   end
@@ -114,7 +116,7 @@ class ErrorStalker::Store::Mongoid < ErrorStalker::Store::Base
         scope.where("data" => {"#{key}" => "#{value}"})
       end
     end
-    
+
     scope.order_by(:timestamp.desc)
   end
 
@@ -130,7 +132,7 @@ class ErrorStalker::Store::Mongoid < ErrorStalker::Store::Base
   # should eventually be more robust, like the Rails version, but for
   # now this should be fine.
   def migrate_data
-    if SchemaMigrations.where(:version => 1).empty?
+    if SchemaMigrations.where(:version => "1").empty?
       ExceptionGroup.all.order_by(:timestamp).desc.each do |group|
         exceptions = ExceptionReport.where(:digest => group.digest).order_by(:timestamp)
         unless exceptions.empty?
@@ -142,7 +144,7 @@ class ErrorStalker::Store::Mongoid < ErrorStalker::Store::Base
           group.save
         end
       end
-      SchemaMigrations.create(:version => 1)
+      SchemaMigrations.create(:version => "1")
     end
   end
 
@@ -173,12 +175,12 @@ class ErrorStalker::Store::Mongoid < ErrorStalker::Store::Base
       {:name => report.machine},
       {:name => report.machine},
       :upsert => true)
-    
+
     Application.collection.update(
       {:name => report.application},
       {:name => report.application},
       :upsert => true)
-    
+
     report.id
   end
 end
@@ -239,6 +241,8 @@ class ErrorStalker::Store::Mongoid::ExceptionGroup < ErrorStalker::ExceptionGrou
     # associated exception reports.
     def paginate(pagination_opts = {})
       recent = @criteria.paginate(pagination_opts)
+      total_entries = recent.total_entries
+
       exceptions = ErrorStalker::Store::Mongoid::ExceptionReport.where(:_id.in => recent.map(&:most_recent_report_id))
       # Fake association preloading
       id_map = {}.tap do |h|
@@ -246,12 +250,20 @@ class ErrorStalker::Store::Mongoid::ExceptionGroup < ErrorStalker::ExceptionGrou
           h[ex.id] = ex
         end
       end
-      
+
+      # Because all the +recent+ stuff is still a scope at this point,
+      # we somehow lose the most_recent_report information that we try
+      # to assign below the next time we iterate over the
+      # scope. Forcing the scope to turn into an array solves that
+      # problem, although it means we have to 'fake-paginate' the
+      # array before we return it.
+      recent = recent.to_a
+
       recent.each do |r|
         r.most_recent_report = id_map[r.most_recent_report_id]
       end
-      
-      recent
+
+      recent.paginate(:per_page => pagination_opts[:per_page], :total_entries => total_entries)
     end
   end
 end
@@ -284,16 +296,16 @@ class ErrorStalker::Store::Mongoid::ExceptionReport
     [:id, :application, :machine, :timestamp, :type, :exception, :digest, :backtrace].each do |field|
       params[field] = send(field)
     end
-    
+
     if data
       params[:data] = {}.tap do |h|
         data.map { |hash| h[hash.keys.first] = hash[hash.keys.first] }
       end
     end
-    
+
     ErrorStalker::ExceptionReport.new(params)
   end
-  
+
   # Create a new mongoid exception report from +exception_report+.
   def self.create_from_exception_report(exception_report)
     object = new do |o|
@@ -307,7 +319,7 @@ class ErrorStalker::Store::Mongoid::ExceptionReport
           exception_report.data.map {|key, value| array << {key => value}}
         end
       end
-      
+
       if exception_report.backtrace
         o.backtrace = exception_report.backtrace
       end

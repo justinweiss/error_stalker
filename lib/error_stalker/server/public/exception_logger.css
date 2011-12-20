@@ -122,6 +122,10 @@ code {
   font-family: Inconsolata, Consolas, 'Lucida Console', monospace;
 }
 
+dl.group_details {
+  overflow: auto;
+}
+
 dl.group_details dt {
   clear: left;
   float: left;
