@@ -100,20 +100,21 @@ class ErrorStalker::Store::Mongoid < ErrorStalker::Store::Base
 
     [:application, :machine].each do |param|
       if params[param] && !params[param].empty?
-        scope.where(param => params[param])
+        puts "HERE: #{params.inspect}"
+        scope = scope.where(param => params[param])
       end
     end
 
     [:exception, :type].each do |param|
       if params[param] && !params[param].empty?
-        scope.where(param => /#{params[param]}/)
+        scope = scope.where(param => /#{params[param]}/)
       end
     end
 
     if params[:data] && !params[:data].empty?
       params[:data].split.each do |keyvalue|
         key, value = keyvalue.split(':')
-        scope.where("data" => {"#{key}" => "#{value}"})
+        scope = scope.where("data" => {"#{key}" => "#{value}"})
       end
     end
 

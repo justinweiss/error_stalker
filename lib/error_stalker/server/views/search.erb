@@ -26,10 +26,10 @@
     <input id="type" type="text" name="type" value="<%= params[:type] %>" />
 
     <% if store.supports_extended_searches? %>
-      <label for="data">Extra data (key:"value")</label>
-      <input id="data" type="text" name="data" value="<%= params[:data] %>" />
+      <label for="data">Extra data</label>
+      <input id="data" type="text" name="data" value="<%= params[:data] %>" placeholder="REMOTE_ADDR:127.0.0.1 PATH:/test" />
     <% end %>
-    
+
     <input type="submit" name="Search" value="Search" />
   </form>
 </div>
