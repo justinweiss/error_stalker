@@ -1,5 +1,5 @@
 <p><a href="/">Back to list</a></p>
-<h1>Exception in <%= h @report.application %></h1>
+<h1>Exception<%= " in #{h @report.application}" unless @report.application.empty? %></h1>
 <h3>on <%= h @report.machine %> @ <%= h @report.timestamp %></h3>
 
 <dl class="group_details">
