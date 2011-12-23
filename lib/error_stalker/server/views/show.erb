@@ -28,5 +28,5 @@
 
 <% if @report.data && !@report.data.empty? %>
 <h3>Additional information</h3>
-<pre><code><%= h @report.data.to_yaml %></code></pre>
+<pre><code><%= h JSON.pretty_generate(@report.data) %></code></pre>
 <% end %>

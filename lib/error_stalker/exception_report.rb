@@ -7,8 +7,8 @@ require 'digest/md5'
 # class, but they should be able to be treated as instances of this
 # class regardless.
 class ErrorStalker::ExceptionReport
-  
-  # The name of the application that caused this exception. 
+
+  # The name of the application that caused this exception.
   attr_reader :application
 
   # The name of the machine that raised this exception.
@@ -22,9 +22,6 @@ class ErrorStalker::ExceptionReport
 
   # The exception object (or string message) this report represents
   attr_reader :exception
-
-  # A hash of extra data logged along with this exception.
-  attr_reader :data
 
   # The backtrace corresponding to this exception. Should be an array
   # of strings, each referring to a single stack frame.
@@ -46,15 +43,15 @@ class ErrorStalker::ExceptionReport
     @machine = params[:machine] || machine_name
     @timestamp = params[:timestamp] || Time.now
     @type = params[:type] || params[:exception].class.name
-    
+
     if params[:exception].is_a?(Exception)
       @exception = params[:exception].to_s
     else
       @exception = params[:exception]
     end
-    
+
     @data = params[:data]
-    
+
     if params[:backtrace]
       @backtrace = params[:backtrace]
     else
@@ -78,6 +75,17 @@ class ErrorStalker::ExceptionReport
     @digest ||= Digest::MD5.hexdigest((backtrace ? backtrace.to_s[0,STACK_DIGEST_LENGTH] : exception.to_s) + type.to_s)
   end
 
+  # A hash of extra data logged along with this exception.
+  def data
+    @data_with_fixed_encoding ||= JSON.parse(raw_data.to_json.encode('utf-8', 'ascii-8bit', :invalid => :replace, :undef => :replace))
+  end
+
+  # The extra data associated with this object, without fixing any
+  # broken encodings.
+  def raw_data
+    @data
+  end
+
   # Serialize this object to json, so we can send it over the wire.
   def to_json
     {
@@ -86,7 +94,7 @@ class ErrorStalker::ExceptionReport
       :timestamp => timestamp,
       :type => type,
       :exception => exception,
-      :data => data,
+      :data => raw_data,
       :backtrace => backtrace
     }.to_json
   end
