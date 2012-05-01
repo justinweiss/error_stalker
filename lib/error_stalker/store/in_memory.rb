@@ -1,4 +1,5 @@
 require 'error_stalker/store/base'
+require 'will_paginate/array'
 require 'set'
 
 # The simplest exception store. This just stores each reported
@@ -42,12 +43,12 @@ class ErrorStalker::Store::InMemory < ErrorStalker::Store::Base
   def reports_in_group(digest)
     exception_groups[digest]
   end
-  
+
   # returns the exception group matching +digest+
   def group(digest)
     build_group_for_exceptions(reports_in_group(digest))
   end
-  
+
   # Empty this exception store. Useful for tests!
   def clear
     @exceptions = []
@@ -55,7 +56,7 @@ class ErrorStalker::Store::InMemory < ErrorStalker::Store::Base
     @machines = Set.new
     @applications = Set.new
   end
-  
+
   # Searches for exception reports maching +params+.
   def search(params = {})
     results = exceptions
@@ -82,14 +83,14 @@ class ErrorStalker::Store::InMemory < ErrorStalker::Store::Base
     exception_groups.map do |digest, group|
       data << build_group_for_exceptions(group)
     end
-     
+
     data.reverse
   end
-  
+
   def total
     @exceptions.count
   end
-  
+
   def total_since(timestamp)
     @exceptions.select { |e| e.timestamp >= timestamp.to_s }.length
   end
