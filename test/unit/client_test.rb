@@ -8,21 +8,21 @@ class ClientTest < Test::Unit::TestCase
     @backend = ErrorStalker::Backend::InMemory.new
     ErrorStalker::Client.backend = @backend
   end
-  
+
   def test_report
-    ErrorStalker::Client.report(:unit_test, new_exception, {:name => "Bob"})
+    ErrorStalker::Client.report(:unit_test, new_exception, {"name" => "Bob"})
 
     assert_equal 1, @backend.exceptions.length
     exception_report = @backend.exceptions.first
     assert_equal :unit_test, exception_report.application
     assert_equal exception_report.send(:machine_name), exception_report.machine
     assert_match "test/unit/client_test.rb:", exception_report.backtrace.first
-    assert_equal 'Bob', exception_report.data[:name]
+    assert_equal 'Bob', exception_report.data["name"]
     assert_equal 'NoMethodError', exception_report.type
   end
 
   def test_report_exceptions_in_block
-    assert_raises NoMethodError do 
+    assert_raises NoMethodError do
       ErrorStalker::Client.report_exceptions(:unit_test) do
         raise new_exception
       end
@@ -49,7 +49,7 @@ class ClientTest < Test::Unit::TestCase
 
   def test_dont_raise_exceptions_during_report
     ErrorStalker::Client.backend = nil
-    
+
     assert_nothing_raised do
       ErrorStalker::Client.report(:unit_test, new_exception, {:name => "Bob"})
     end
