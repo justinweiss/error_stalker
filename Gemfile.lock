@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    error_stalker (0.0.14)
+    error_stalker (0.0.15)
 
 GEM
   remote: http://rubygems.org/
