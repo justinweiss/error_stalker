@@ -264,7 +264,13 @@ class ErrorStalker::Store::Mongoid::ExceptionGroup < ErrorStalker::ExceptionGrou
         r.most_recent_report = id_map[r.most_recent_report_id]
       end
 
-      recent.paginate(:per_page => pagination_opts[:per_page], :total_entries => total_entries)
+      recent = recent.paginate(:per_page => pagination_opts[:per_page], :total_entries => total_entries)
+
+      # We're 'fake paginating' this collection, but we still want the
+      # page number to be correct. This is the only way to set it
+      # without triggering a pagination on records we don't actually have.
+      recent.instance_variable_set(:@current_page, WillPaginate::PageNumber(pagination_opts[:page] || 1))
+      recent
     end
   end
 end
