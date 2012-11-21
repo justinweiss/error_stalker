@@ -15,15 +15,26 @@ class ErrorStalker::ExceptionGroup
 
   # The first time this exception occurred
   attr_accessor :first_timestamp
-  
+
   # The most recent time this exception occurred
   attr_accessor :most_recent_timestamp
 
   # The most recent ExceptionReport instance belonging to this group
   attr_accessor :most_recent_report
-  
+
   def type
     most_recent_report.type unless most_recent_report.nil?
   end
-  
+
+  def to_h
+    {
+      :count => count,
+      :digest => digest,
+      :machines => machines,
+      :first_timestamp => first_timestamp.to_s,
+      :most_recent_timestamp => most_recent_timestamp,
+      :most_recent_report => most_recent_report.to_h
+    }
+  end
+
 end

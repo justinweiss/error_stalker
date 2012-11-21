@@ -86,8 +86,7 @@ class ErrorStalker::ExceptionReport
     @data
   end
 
-  # Serialize this object to json, so we can send it over the wire.
-  def to_json
+  def to_h
     {
       :application => application,
       :machine => machine,
@@ -96,7 +95,12 @@ class ErrorStalker::ExceptionReport
       :exception => exception,
       :data => raw_data,
       :backtrace => backtrace
-    }.to_json
+    }
+  end
+
+  # Serialize this object to json, so we can send it over the wire.
+  def to_json
+    self.to_h.to_json
   end
 
   private
