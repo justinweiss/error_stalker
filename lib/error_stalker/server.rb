@@ -98,9 +98,17 @@ module ErrorStalker
       self.store = self.class.store
     end
 
-    get '/' do
-      @records = store.recent.paginate(:page => params[:page], :per_page => PER_PAGE)
-      erb :index
+    ['/', '/recent.?:format?'].each do |path|
+      get path do
+        @records = store.recent.paginate(:page => params[:page], :per_page => PER_PAGE)
+
+        if params[:format] == 'json'
+          recent_exceptions = @records.map { |r| r.to_h }
+          {:recent_exceptions => recent_exceptions}.to_json
+        else
+          erb :index
+        end
+      end
     end
 
     get '/search' do

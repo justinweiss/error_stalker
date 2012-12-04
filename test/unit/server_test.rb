@@ -2,6 +2,7 @@ require 'test_helper'
 require 'rack/test'
 require 'error_stalker/server'
 require 'mocha'
+require 'json'
 
 ENV['RACK_ENV'] = 'test'
 
@@ -27,6 +28,11 @@ class ServerTest < Test::Unit::TestCase
     get '/'
     assert last_response.ok?
     assert_no_match /table/, last_response.body
+
+    get "/recent.json"
+    assert last_response.ok?
+    stats = JSON.parse(last_response.body)
+    assert_equal [], stats['recent_exceptions']
   end
 
   def test_can_see_homepage_table_after_exception_logged
@@ -35,6 +41,11 @@ class ServerTest < Test::Unit::TestCase
     assert last_response.ok?
     assert_match /table/, last_response.body
     assert_match /failed/, last_response.body
+
+    get "/recent.json"
+    assert last_response.ok?
+    stats = JSON.parse(last_response.body)
+    assert_equal 1, stats['recent_exceptions'][0]['count']
   end
 
   def test_groups_aggregated_on_homepage
@@ -69,7 +80,7 @@ class ServerTest < Test::Unit::TestCase
     report_exception('test', 1)
     assert_equal 2, Mail::TestMailer.deliveries.length
   end
-  
+
   def test_stats_renders_total
     report_exception('test', 4)
     get "/stats.json"
@@ -77,7 +88,7 @@ class ServerTest < Test::Unit::TestCase
     stats = JSON.parse(last_response.body)
     assert_equal 4, stats['total']
   end
-  
+
   def test_stats_renders_timestamp
     report_exception('test', 1)
     timestamp = Time.now.to_i - 60 # one minute ago
@@ -126,13 +137,13 @@ class ServerTest < Test::Unit::TestCase
   protected
   def report_exception(message = "failed", count = 1, data = {})
     e = nil
-    count.times do 
+    count.times do
       begin
         raise NoMethodError, message
       rescue => ex
         e = ErrorStalker::ExceptionReport.new(:exception => ex, :application => 'test', :data => data)
       end
-      
+
       post '/report.json', e.to_json
     end
     e
