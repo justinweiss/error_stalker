@@ -70,7 +70,7 @@ DEPENDENCIES
   mocha (~> 0.9.10)
   mongoid (~> 2.2.0)
   rack-test (~> 0.5.7)
-  rake
+  rake (~> 10.1.0)
   sinatra (~> 1.1.2)
   thin (~> 1.2.7)
   vegas (~> 0.1.8)

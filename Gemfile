@@ -30,4 +30,4 @@ end
 
 gem 'json', '1.4.6', :platforms => :ruby_18
 
-gem 'rake'
+gem 'rake', '~>10.1.0'
