@@ -29,3 +29,5 @@ group :email_sender do
 end
 
 gem 'json', '1.4.6', :platforms => :ruby_18
+
+gem 'rake'

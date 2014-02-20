@@ -1,5 +1,3 @@
-require 'error_stalker/exception_report'
-require 'error_stalker/backend'
 require 'tempfile'
 
 # The error_stalker client enables you to log exception data to a

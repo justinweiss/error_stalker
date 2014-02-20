@@ -1,6 +1,7 @@
 require 'bundler'
 require 'rake/testtask'
-require 'rake/rdoctask'
+# require 'rake/rdoctask'
+require 'rdoc/task'
 Bundler::GemHelper.install_tasks
 
 task :default => :test
