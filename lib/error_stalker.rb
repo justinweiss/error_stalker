@@ -1,4 +1,3 @@
 module ErrorStalker # :nodoc:
+  autoload :Client, "error_stalker/client"
 end
-
-require 'error_stalker/client'
